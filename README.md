@@ -1,9 +1,15 @@
-vbot
-====
-
 Vindinium Bot
+=============
 
-Inspired from git@github.com:kcampion/vindinium-starter-php.git
+Inspired by git@github.com:kcampion/vindinium-starter-php.git
+
+## Ideas of enhancements:
+
+    New command option to choose map
+    use Guzzle for HTTP Client
+    A* lib for hero moving
+    Use a model to represent game state
+    Store states, games
 
 ## Libraries deps:
 
