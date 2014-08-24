@@ -10,10 +10,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use VBot\Starter\Client;
 
 /**
- * Run the game
+ * Run a training game
  *
- * @author  Nicolas Dupont <nicolas@akeneo.com>
- * @licence MIT
+ * @author Nicolas Dupont <nicolas@akeneo.com>
  */
 class RunTrainingCommand extends Command
 {

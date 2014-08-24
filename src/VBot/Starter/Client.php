@@ -2,6 +2,8 @@
 
 namespace VBot\Starter;
 
+use VBot\Bot\RandomBot;
+
 // cf kcampion/vindinium-starter-php.git
 class Client
 {
@@ -19,35 +21,10 @@ class Client
         $this->mode = $mode;
         $this->numberOfTurns = $nbTurns;
         $this->numberOfGames = $nbGames;
-        // TODO remove original setup
-        /*
-        if ($_SERVER['argc'] < 4) {
-            echo "Usage: " . $_SERVER['SCRIPT_FILENAME'] . " <key> <[training|arena]> <number-of-games|number-of-turns> [server-url]\n";
-            echo "Example: " . $_SERVER['SCRIPT_FILENAME'] . " mySecretKey training 20\n";
-        } else {
-            $this->key = $_SERVER['argv'][1];
-            $this->mode = $_SERVER['argv'][2];
-
-            if ($this->mode == "training") {
-                $this->numberOfGames = 1;
-                $this->numberOfTurns = (int) $_SERVER['argv'][3];
-            } else {
-                $this->numberOfGames = (int) $_SERVER['argv'][3];
-                $this->numberOfTurns = 300; # Ignored in arena mode
-            }
-
-            if ($_SERVER['argc'] == 5) {
-                $this->serverUrl = $_SERVER['argv'][4];
-            }
-        }*/
     }
 
     public function load()
     {
-        // TODO : fix autoload
-        //require './Bot.php';
-        //require './HttpPost.php';
-
         for ($i = 0; $i <= ($this->numberOfGames - 1); $i++) {
             $this->start(new RandomBot());
             echo "\nGame finished: " . ($i + 1) . "/" . $this->numberOfGames . "\n";

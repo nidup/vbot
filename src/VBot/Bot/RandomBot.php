@@ -1,8 +1,13 @@
 <?php
 
-namespace VBot\Starter;
+namespace VBot\Bot;
 
-class RandomBot extends Bot
+/**
+ * Random Bot
+ *
+ * @author Nicolas Dupont <nicolas@akeneo.com>
+ */
+class RandomBot implements BotInterface
 {
     public function move($state)
     {
