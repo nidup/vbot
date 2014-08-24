@@ -1,0 +1,21 @@
+{
+    "name": "nidup/vbot",
+    "description": "Vindinium Bot",
+    "license": "MIT",
+    "keywords": ["AI"],
+    "authors": [
+        {
+            "name": "Nicolas Dupont",
+            "email": "nicolas@akeneo.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "VBot\\": "./src/"
+        }
+    },
+    "require": {
+        "symfony/console": "2.5.3"
+    },
+    "minimum-stability": "dev"
+}

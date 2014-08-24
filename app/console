@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+
+require_once('vendor/autoload.php');
+
+set_time_limit(0);
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 1);
+
+use Symfony\Component\Console\Application;
+use VBot\Command\RunTrainingCommand;
+
+$application = new Application();
+$application->add(new RunTrainingCommand());
+$application->run();

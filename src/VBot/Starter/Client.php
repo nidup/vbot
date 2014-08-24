@@ -1,17 +1,26 @@
 <?php
 
+namespace VBot\Starter;
+
+// cf kcampion/vindinium-starter-php.git
 class Client
 {
 
-    CONST TIMEOUT = 15;
+    const TIMEOUT = 15;
     private $key;
     private $mode;
     private $numberOfGames;
     private $numberOfTurns;
     private $serverUrl = 'http://vindinium.org';
 
-    public function __construct()
+    public function __construct($key, $mode = 'training', $nbTurns = 300, $nbGames = 1)
     {
+        $this->key = $key;
+        $this->mode = $mode;
+        $this->numberOfTurns = $nbTurns;
+        $this->numberOfGames = $nbGames;
+        // TODO remove original setup
+        /*
         if ($_SERVER['argc'] < 4) {
             echo "Usage: " . $_SERVER['SCRIPT_FILENAME'] . " <key> <[training|arena]> <number-of-games|number-of-turns> [server-url]\n";
             echo "Example: " . $_SERVER['SCRIPT_FILENAME'] . " mySecretKey training 20\n";
@@ -21,22 +30,23 @@ class Client
 
             if ($this->mode == "training") {
                 $this->numberOfGames = 1;
-                $this->numberOfTurns = (int)$_SERVER['argv'][3];
+                $this->numberOfTurns = (int) $_SERVER['argv'][3];
             } else {
-                $this->numberOfGames = (int)$_SERVER['argv'][3];
+                $this->numberOfGames = (int) $_SERVER['argv'][3];
                 $this->numberOfTurns = 300; # Ignored in arena mode
             }
 
             if ($_SERVER['argc'] == 5) {
                 $this->serverUrl = $_SERVER['argv'][4];
             }
-        }
+        }*/
     }
 
     public function load()
     {
-        require('./Bot.php');
-        require('./HttpPost.php');
+        // TODO : fix autoload
+        //require './Bot.php';
+        //require './HttpPost.php';
 
         for ($i = 0; $i <= ($this->numberOfGames - 1); $i++) {
             $this->start(new RandomBot());
@@ -105,10 +115,12 @@ class Client
                 return json_decode($r['content'], true);
             } else {
                 echo "Error HTTP " . $r['headers']['status_code'] . "\n" . $r['content'] . "\n";
+
                 return array('game' => array('finished' => true));
             }
         } catch (\Exception $e) {
             echo $e->getMessage() . "\n";
+
             return array('game' => array('finished' => true));
         }
     }
