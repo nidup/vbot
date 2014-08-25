@@ -125,4 +125,56 @@ class Game
     {
         return $this->board->getMines();
     }
+
+    /**
+     * @param Hero $hero
+     *
+     * @return Mine|null
+     */
+    public function getClosestNotOwnedMine(Hero $hero)
+    {
+        // TODO closest
+        $mines = $this->getMines();
+        foreach ($mines as $mine) {
+            if ($mine->getOwnerId() !== $hero->getId()) {
+                return $mine;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param Hero $hero
+     *
+     * @return Tavern
+     */
+    public function getClosestTavern(Hero $hero)
+    {
+        $taverns = $this->getTaverns();
+        // TODO closest
+        $target = current($taverns);
+
+        return $target;
+    }
+
+    /**
+     * @return Hero|null
+     */
+    public function getEnemyWithMoreMines()
+    {
+        // TODO : a enemy class + inject extra deps/utils in Hero (Astar?)
+        // TODO : use collections with custom sorters
+        $enemies = $this->getEnemies();
+        $target = null;
+        foreach ($enemies as $enemy) {
+            if ($target === null) {
+                $target = $enemy;
+            } elseif ($target->getMineCount() < $enemy->getMineCount()) {
+                $target = $enemy;
+            }
+        }
+
+        return $target;
+    }
 }

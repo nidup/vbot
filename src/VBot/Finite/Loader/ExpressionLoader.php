@@ -14,8 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
- * Expression loader, extends ArrayLoader, would prefer decorate it but the whole content is private,
- * no way to add options in transitions config too
+ * Expression loader
  *
  * @author Nicolas Dupont <nicolas@akeneo.com>
  */
@@ -113,11 +112,22 @@ class ExpressionLoader implements LoaderInterface
         $stateMachine->getDispatcher()->addListener(
             'finite.test_transition.'.$transition,
             function (TransitionEvent $event) use ($language, $config) {
-                $hero = $event->getStateMachine()->getObject()->getGame()->getHero();
+                $object = $event->getStateMachine()->getObject();
+                $game = $object->getGame();
+                $hero = $game->getHero();
                 if ($language->evaluate($config['condition'], ['hero' => $hero]) === false) {
                     $event->reject();
                 } else {
+                    $target = $language->evaluate(
+                        $config['action'],
+                        ['game' => $game, 'hero' => $hero]
+                    );
+                    //var_dump($event->getTransition()->getName());
+                    //var_dump($target);
+                    $object->setTarget($target);
+
                     // TODO : execute action
+                    // TODO : move to apply listener !!
                 }
             }
         );
