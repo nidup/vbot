@@ -17,8 +17,9 @@ class BotFactory
      */
     public function createBot($type = 'default', $options = [])
     {
+        $decisionEngine = new Decision\DecisionEngine();
         $moveEngine = new Move\MoveEngine();
-        $bot = new FSMBot($moveEngine);
+        $bot = new FSMBot($decisionEngine, $moveEngine);
 
         return $bot;
     }

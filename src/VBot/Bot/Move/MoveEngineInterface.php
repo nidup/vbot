@@ -6,7 +6,7 @@ use VBot\Game\DestinationInterface;
 use VBot\Game\Board;
 
 /**
- * Move engine interface
+ * Move engine interface, aims to choose the best direction to reach the target
  *
  * @author Nicolas Dupont <nicolas@akeneo.com>
  */

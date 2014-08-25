@@ -2,7 +2,6 @@
 
 namespace VBot\Bot\Move;
 
-// TODO use position class ?
 use VBot\Game\DestinationInterface;
 use VBot\Game\Board;
 use VBot\AStar;
@@ -14,6 +13,9 @@ use VBot\AStar;
  */
 class MoveEngine implements MoveEngineInterface
 {
+    /** @var boolean */
+    const DEBUG = false;
+
     /**
      * {@inheritDoc}
      */
@@ -27,9 +29,11 @@ class MoveEngine implements MoveEngineInterface
         $goal = new AStar\MyNode($target->getPosX(), $target->getPosY());
         $aStar = new AStar\MyAStar($terrainCost);
         $solution = $aStar->run($start, $goal);
-        // TODO debugger purpose
-        //$printer = new AStar\SequencePrinter($terrainCost, $solution);
-        //$printer->printSequence();
+
+        if (self::DEBUG) {
+            $printer = new AStar\SequencePrinter($terrainCost, $solution);
+            $printer->printSequence();
+        }
 
         if (!isset($solution[1])) {
             return 'Stay';
