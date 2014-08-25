@@ -7,7 +7,6 @@ use Finite\State\State;
 use Finite\State\StateInterface;
 use Finite\StateMachine\StateMachine;
 use Finite\Loader\ArrayLoader;
-use VBot\AStar;
 use VBot\Game\Game;
 
 /**
@@ -17,6 +16,9 @@ use VBot\Game\Game;
  */
 class FSMBot implements BotInterface, StatefulInterface
 {
+    /** @var MoveEngineInterface */
+    protected $moveEngine;
+
     /** @var StateInterface $state */
     protected $state;
 
@@ -24,6 +26,14 @@ class FSMBot implements BotInterface, StatefulInterface
     protected $stateMachine = null;
 
     protected $game;
+
+    /**
+     * @param MoveEngineInterface $moveEngine
+     */
+    public function __construct($moveEngine)
+    {
+        $this->moveEngine = $moveEngine;
+    }
 
     /**
      * @param StateInterface $state
@@ -101,39 +111,7 @@ class FSMBot implements BotInterface, StatefulInterface
         }
 
         if ($target !== null) {
-            $myPosX = $game->getHero()->getPosX();
-            $myPosY = $game->getHero()->getPosY();
-            $terrainCostFactory = new AStar\TerrainCostFactory();
-            $terrainCost = $terrainCostFactory->create($game->getBoard());
-            $start = new AStar\MyNode($myPosX, $myPosY);
-            $goal = new AStar\MyNode($target->getPosX(), $target->getPosY());
-            $aStar = new AStar\MyAStar($terrainCost);
-            $solution = $aStar->run($start, $goal);
-            //$printer = new AStar\SequencePrinter($terrainCost, $solution);
-            //$printer->printSequence();
-
-            if (!isset($solution[1])) {
-                return 'Stay';
-            }
-
-            $firstNode = $solution[1];
-            $destX = (int) $firstNode->getRow();
-            $destY = (int) $firstNode->getColumn();
-
-            $destination = 'Stay';
-
-            if ($destX > $myPosX) {
-                $destination = 'South';
-
-            } elseif ($destX < $myPosX) {
-                $destination = 'North';
-
-            } elseif ($destY > $myPosY) {
-                $destination = 'East';
-
-            } elseif ($destY < $myPosY) {
-                $destination = 'West';
-            }
+            return $this->moveEngine->move($game->getBoard(), $game->getHero(), $target);
 
             return $destination;
         }

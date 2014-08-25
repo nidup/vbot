@@ -7,7 +7,7 @@ namespace VBot\Game;
  *
  * @author Nicolas Dupont <nicolas@akeneo.com>
  */
-class Hero
+class Hero implements DestinationInterface
 {
     /** @var string */
     protected $id;

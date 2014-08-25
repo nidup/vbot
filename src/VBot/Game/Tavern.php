@@ -7,7 +7,7 @@ namespace VBot\Game;
  *
  * @author Nicolas Dupont <nicolas@akeneo.com>
  */
-class Tavern
+class Tavern implements DestinationInterface
 {
     /** @var Position */
     protected $position;
