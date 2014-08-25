@@ -2,6 +2,8 @@
 
 namespace VBot\Bot;
 
+use VBot\Game\Game;
+
 /**
  * Bot interface
  *
@@ -10,8 +12,9 @@ namespace VBot\Bot;
 interface BotInterface
 {
     /**
-     * TODO : could be replaced by a state object
-     * @param array
+     * @param Game $game
+     *
+     * @return string the direction
      */
-    public function move($state);
+    public function move(Game $game);
 }

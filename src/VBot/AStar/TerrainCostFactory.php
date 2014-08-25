@@ -2,6 +2,8 @@
 
 namespace VBot\AStar;
 
+use VBot\Game\Board;
+
 /**
  * Create TerrainCost from Vindinium board tiles
  *
@@ -22,14 +24,14 @@ class TerrainCostFactory
     const HERO = '@%';
 
     /**
-     * @param string $tiles
-     * @param int    $size
+     * @param Board $board
      *
      * @return TerrainCost
      */
-    public function create($tiles, $size)
+    public function create($board)
     {
-        $tiles = str_split($tiles, 2);
+        $size = $board->getSize();
+        $tiles = str_split($board->getTiles(), 2);
         $indX = 0;
         $cost = [];
         $rowCost = [];

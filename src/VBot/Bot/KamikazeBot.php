@@ -3,6 +3,7 @@
 namespace VBot\Bot;
 
 use VBot\AStar;
+use VBot\Game\Game;
 
 /**
  * Kamikaze Bot
@@ -11,35 +12,28 @@ use VBot\AStar;
  */
 class KamikazeBot implements BotInterface
 {
-    public function move($state)
+    /**
+     * {@inheritDoc}
+     */
+    public function move(Game $game)
     {
-        // my basic data
-        $myPosX = (int) $state['hero']['pos']['x'];
-        $myPosY = (int) $state['hero']['pos']['y'];
-        $myId = $state['hero']['id'];
-
         // detect first enemy
-        $enemyId = null;
-        foreach ($state['game']['heroes'] as $heroData) {
-            if ($heroData['id'] != $myId) {
-                $enemyId = $heroData['id'];
-                $enemyPosX = (int) $heroData['pos']['x'];
-                $enemyPosY = (int) $heroData['pos']['y'];
-                break;
-            }
+        $enemies = $game->getEnemies();
+        if (empty($enemies)) {
+            return 'Stay';
         }
-       
+        $target = current($enemies);
+
         // find path to join the enemy
-        $boardTiles = $state['game']['board']['tiles'];
-        $boardSize = (int) $state['game']['board']['size'];
+        $myPosX = $game->getHero()->getPosX();
+        $myPosY = $game->getHero()->getPosY();
         $terrainCostFactory = new AStar\TerrainCostFactory();
-        $terrainCost = $terrainCostFactory->create($boardTiles, $boardSize);
+        $terrainCost = $terrainCostFactory->create($game->getBoard());
         $start = new AStar\MyNode($myPosX, $myPosY);
-        $goal = new AStar\MyNode($enemyPosX, $enemyPosY);
+        $goal = new AStar\MyNode($target->getPosX(), $target->getPosY());
         $aStar = new AStar\MyAStar($terrainCost);
         $solution = $aStar->run($start, $goal);
-
-        $printer = new AStar\SequencePrinter($terrainCost, $solution);
+        //$printer = new AStar\SequencePrinter($terrainCost, $solution);
         //$printer->printSequence();
 
         if (!isset($solution[1])) {
@@ -47,11 +41,8 @@ class KamikazeBot implements BotInterface
         }
 
         $firstNode = $solution[1];
-        $destX = (int) $firstNode->getColumn();
-        $destY = (int) $firstNode->getRow();
-
-        //echo PHP_EOL.'X dest > pos : '.$destX.' > '.$myPosX.PHP_EOL;
-        //echo 'Y dest > pos : '.$destY.' > '.$myPosY.PHP_EOL;
+        $destX = (int) $firstNode->getRow();
+        $destY = (int) $firstNode->getColumn();
 
         $destination = 'Stay';
 
@@ -67,7 +58,6 @@ class KamikazeBot implements BotInterface
         } elseif ($destY < $myPosY) {
             $destination = 'West';
         }
-        //var_dump($destination);
 
         return $destination;
     }

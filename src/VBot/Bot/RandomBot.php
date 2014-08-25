@@ -2,6 +2,8 @@
 
 namespace VBot\Bot;
 
+use VBot\Game\Game;
+
 /**
  * Random Bot
  *
@@ -9,7 +11,10 @@ namespace VBot\Bot;
  */
 class RandomBot implements BotInterface
 {
-    public function move($state)
+    /**
+     * {@inheritDoc}
+     */
+    public function move(Game $game)
     {
         $dirs = array('Stay', 'North', 'South', 'East', 'West');
 

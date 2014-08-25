@@ -3,6 +3,7 @@
 namespace VBot\Starter;
 
 use VBot\Bot\BotInterface;
+use VBot\Game\Game;
 
 // cf kcampion/vindinium-starter-php.git
 class Client
@@ -52,7 +53,8 @@ class Client
 
             // Move to some direction
             $url = $state['playUrl'];
-            $direction = $botObject->move($state);
+            $game = new Game($state);
+            $direction = $botObject->move($game);
             $state = $this->move($url, $direction);
         }
         ob_end_clean();

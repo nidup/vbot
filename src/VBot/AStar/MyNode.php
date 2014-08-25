@@ -18,7 +18,7 @@ class MyNode extends AbstractNode
     }
 
     /**
-     * @param Node $node
+     * @param  Node   $node
      * @return MyNode
      */
     public static function fromNode(Node $node)
