@@ -30,27 +30,17 @@ class TerrainCostFactory
     public function create($tiles, $size)
     {
         $tiles = str_split($tiles, 2);
-
         $indX = 0;
-        $cost = [];
-        foreach ($tiles as $tile) {
-            $cost[$indX][]= ($tile === self::IMPASSABLE_WOOD) ? PHP_INT_MAX : 1;
-            if (++$indX % $size === 0) {
-                $indX = 0;
-            }
-        }
-        /*
-        $indY = 0;
         $cost = [];
         $rowCost = [];
         foreach ($tiles as $tile) {
             $rowCost[]= ($tile === self::IMPASSABLE_WOOD) ? PHP_INT_MAX : 1;
-            if (++$indY % $size === 0) {
+            if (++$indX % $size === 0) {
                 $cost[]= $rowCost;
                 $rowCost = [];
             }
         }
-         */
+
         return new TerrainCost($cost);
     }
 }

@@ -34,8 +34,8 @@ class KamikazeBot implements BotInterface
         $boardSize = (int) $state['game']['board']['size'];
         $terrainCostFactory = new AStar\TerrainCostFactory();
         $terrainCost = $terrainCostFactory->create($boardTiles, $boardSize);
-        $start = new AStar\MyNode($myPosY, $myPosX);
-        $goal = new AStar\MyNode($enemyPosY, $enemyPosX);
+        $start = new AStar\MyNode($myPosX, $myPosY);
+        $goal = new AStar\MyNode($enemyPosX, $enemyPosY);
         $aStar = new AStar\MyAStar($terrainCost);
         $solution = $aStar->run($start, $goal);
 
@@ -67,7 +67,6 @@ class KamikazeBot implements BotInterface
         } elseif ($destY < $myPosY) {
             $destination = 'West';
         }
-
         //var_dump($destination);
 
         return $destination;
