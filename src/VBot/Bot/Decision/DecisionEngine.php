@@ -4,12 +4,11 @@ namespace VBot\Bot\Decision;
 
 use VBot\Game\Game;
 use VBot\Game\DestinationInterface;
+use VBot\Finite\Loader\ExpressionLoader;
 use Finite\StatefulInterface;
 use Finite\State\State;
 use Finite\State\StateInterface;
 use Finite\StateMachine\StateMachine;
-use Finite\Loader\ArrayLoader;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
  * Decision engine
@@ -114,66 +113,51 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                 'waiting' => [
                     'from' => ['stay'],
                     'to' => 'goto-mine',
-                    /*
-                     TODO : don't wait anymore, get a mine then attack
-                    'guard' => function () {
-                        return $this->game->getTurn() >= 20;
-                    }*/
                 ],
                 'defend-mine' => [
                     'from' => ['goto-mine'],
                     'to' => 'goto-enemy',
-                    'guard' => function () {
-                        $hero = $this->game->getHero();
-
-                        return $hero->getMineCount() > 1;
-                    }
                 ],
                 'hurted' => [
                     'from' => ['stay', 'goto-enemy', 'goto-mine'],
                     'to' => 'goto-tavern',
-                    /*'guard' => function () {
-                        $hero = $this->game->getHero();
-
-                        return $hero->getLife() < 60 && $hero->getGold() >= 2;
-                    }*/
                 ],
                 'healed' => [
                     'from' => ['goto-tavern'],
                     'to' => 'goto-enemy',
-                    'guard' => function () {
-                        $hero = $this->game->getHero();
-
-                        return $hero->getLife() > 85;
-                    }
                 ],
                 'dying' => [
                     'from' => ['stay', 'goto-mine', 'goto-tavern', 'goto-enemy'],
                     'to' => 'dead',
-                    'guard' => function () {
-                        $hero = $this->game->getHero();
-
-                        return $hero->isCrashed();
-                    }
+                ]
+            ],
+            'expressions' => [
+                'waiting' => [
+                    'condition' => 'true',
+                    'action' => ''
+                ],
+                'defend-mine' => [
+                    'condition' => 'hero.getMineCount() > 1',
+                    'action' => ''
+                ],
+                'hurted' => [
+                    'condition'   => 'hero.getLife() < 50 && hero.getGold() >= 2',
+                    'action' => ''
+                ],
+                'healed' => [
+                    'condition'   => 'hero.getLife() > 85',
+                    'action' => ''
+                ],
+                'dying' => [
+                    'condition'   => 'hero.isCrashed()',
+                    'action' => ''
                 ]
             ]
         ];
-        $loader = new ArrayLoader($data);
+        $loader = new ExpressionLoader($data);
         $loader->load($this->stateMachine);
         $this->stateMachine->setObject($this);
         $this->stateMachine->initialize();
-
-        $language = new ExpressionLanguage();
-        $testExpression = 'hero.getLife() < 60 && hero.getGold() >= 2'; // TODO replace by assert
-        $doExpression = 'do';
-        $this->stateMachine->getDispatcher()->addListener('finite.test_transition.hurted', function(\Finite\Event\TransitionEvent $event) use ($language, $testExpression, $doExpression) {
-            $hero = $event->getStateMachine()->getObject()->getGame()->getHero();
-            if ($language->evaluate($testExpression, ['hero' => $hero]) === false) {
-                $event->reject();
-            } else {
-                // echo 'Transition accepted '.$event->getTransition()->getName().PHP_EOL;
-            }
-        });
 
         return true;
     }
