@@ -6,23 +6,38 @@ use VBot\AStar;
 use VBot\Game\Game;
 
 /**
- * Kamikaze Bot
+ * Thief Bot, follows a basic strategy, always attack the richest mine owner
+ *
+ * TODO : could be enhanced by going to the tavern
  *
  * @author Nicolas Dupont <nicolas@akeneo.com>
  */
-class KamikazeBot implements BotInterface
+class ThiefBot implements BotInterface
 {
     /**
      * {@inheritDoc}
      */
     public function move(Game $game)
     {
-        // detect first enemy
+        // wait
+        if ($game->getTurn() < 20) {
+            return 'Stay';
+        }
+
+        // detect biggest mine owner
         $enemies = $game->getEnemies();
         if (empty($enemies)) {
             return 'Stay';
         }
-        $target = current($enemies);
+
+        $target = null;
+        foreach ($enemies as $enemy) {
+            if ($target === null) {
+                $target = $enemy;
+            } elseif ($target->getMineCount() < $enemy->getMineCount()) {
+                $target = $enemy;
+            }
+        }
 
         // find path to join the enemy
         $myPosX = $game->getHero()->getPosX();

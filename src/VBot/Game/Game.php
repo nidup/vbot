@@ -101,4 +101,12 @@ class Game
     {
         return $this->board;
     }
+
+    /**
+     * @return integer
+     */
+    public function getTurn()
+    {
+        return $this->turn;
+    }
 }

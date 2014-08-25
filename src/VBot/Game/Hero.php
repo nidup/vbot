@@ -79,4 +79,12 @@ class Hero
     {
         return $this->position->getY();
     }
+
+    /**
+     * @return integer
+     */
+    public function getMineCount()
+    {
+        return $this->mineCount;
+    }
 }
