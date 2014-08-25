@@ -8,6 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 use VBot\Starter\Client;
+use VBot\Bot\KamikazeBot;
 
 /**
  * Run a training game
@@ -36,7 +37,10 @@ class RunTrainingCommand extends Command
         $output->writeln('Run a Vindinium training');
         $output->writeln('');
 
+        $bot = new KamikazeBot();
+
         $client = new Client(
+            $bot,
             $input->getArgument('key'),
             'training',
             $input->getArgument('turns')

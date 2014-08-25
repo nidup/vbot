@@ -7,8 +7,9 @@ Inspired by git@github.com:kcampion/vindinium-starter-php.git
 
     New command option to choose map
     use Guzzle for HTTP Client
-    A* lib for hero moving
-    Use a model to represent game state
+    A* lib for hero moving cf https://github.com/jmgq/php-a-star ?
+    FSM based Bot cf https://github.com/yohang/Finite ?
+    Use a model to represent game state, observer to update ?
     Store states, games
 
 ## Libraries deps:

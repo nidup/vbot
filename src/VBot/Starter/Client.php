@@ -2,21 +2,23 @@
 
 namespace VBot\Starter;
 
-use VBot\Bot\RandomBot;
+use VBot\Bot\BotInterface;
 
 // cf kcampion/vindinium-starter-php.git
 class Client
 {
 
     const TIMEOUT = 15;
+    private $bot;
     private $key;
     private $mode;
     private $numberOfGames;
     private $numberOfTurns;
     private $serverUrl = 'http://vindinium.org';
 
-    public function __construct($key, $mode = 'training', $nbTurns = 300, $nbGames = 1)
+    public function __construct(BotInterface $bot, $key, $mode = 'training', $nbTurns = 300, $nbGames = 1)
     {
+        $this->bot = $bot;
         $this->key = $key;
         $this->mode = $mode;
         $this->numberOfTurns = $nbTurns;
@@ -26,7 +28,7 @@ class Client
     public function load()
     {
         for ($i = 0; $i <= ($this->numberOfGames - 1); $i++) {
-            $this->start(new RandomBot());
+            $this->start($this->bot);
             echo "\nGame finished: " . ($i + 1) . "/" . $this->numberOfGames . "\n";
         }
     }

@@ -15,7 +15,8 @@
         }
     },
     "require": {
-        "symfony/console": "2.5.3"
+        "symfony/console": "2.5.3",
+        "jmgq/a-star": "1.1.0"
     },
     "minimum-stability": "dev"
 }
