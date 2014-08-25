@@ -9,6 +9,7 @@ use Finite\State\State;
 use Finite\State\StateInterface;
 use Finite\StateMachine\StateMachine;
 use Finite\Loader\ArrayLoader;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
  * Decision engine
@@ -55,6 +56,14 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
     public function getFiniteState()
     {
         return $this->state;
+    }
+
+    /**
+     * @return Game
+     */
+    public function getGame()
+    {
+        return $this->game;
     }
 
     /**
@@ -106,7 +115,7 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                     'from' => ['stay'],
                     'to' => 'goto-mine',
                     /*
-                     TODO : don't way anymore, get a mine then attack
+                     TODO : don't wait anymore, get a mine then attack
                     'guard' => function () {
                         return $this->game->getTurn() >= 20;
                     }*/
@@ -123,11 +132,11 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                 'hurted' => [
                     'from' => ['stay', 'goto-enemy', 'goto-mine'],
                     'to' => 'goto-tavern',
-                    'guard' => function () {
+                    /*'guard' => function () {
                         $hero = $this->game->getHero();
 
                         return $hero->getLife() < 60 && $hero->getGold() >= 2;
-                    }
+                    }*/
                 ],
                 'healed' => [
                     'from' => ['goto-tavern'],
@@ -153,6 +162,18 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
         $loader->load($this->stateMachine);
         $this->stateMachine->setObject($this);
         $this->stateMachine->initialize();
+
+        $language = new ExpressionLanguage();
+        $testExpression = 'hero.getLife() < 60 && hero.getGold() >= 2'; // TODO replace by assert
+        $doExpression = 'do';
+        $this->stateMachine->getDispatcher()->addListener('finite.test_transition.hurted', function(\Finite\Event\TransitionEvent $event) use ($language, $testExpression, $doExpression) {
+            $hero = $event->getStateMachine()->getObject()->getGame()->getHero();
+            if ($language->evaluate($testExpression, ['hero' => $hero]) === false) {
+                $event->reject();
+            } else {
+                // echo 'Transition accepted '.$event->getTransition()->getName().PHP_EOL;
+            }
+        });
 
         return true;
     }
