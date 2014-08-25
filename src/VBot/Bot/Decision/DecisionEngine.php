@@ -18,7 +18,7 @@ use Finite\Loader\ArrayLoader;
 class DecisionEngine implements DecisionEngineInterface, StatefulInterface
 {
     /** @var boolean */
-    const DEBUG = false;
+    const DEBUG = true;
 
     /** @var Game */
     protected $game;
@@ -84,14 +84,14 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                     'type' => StateInterface::TYPE_INITIAL,
                     'properties' => []
                 ],
-                /*'goto-tavern' => [
-                    'type' => StateInterface::TYPE_NORMAL,
-                    'properties' => []
-                ],*/
                 'goto-enemy' => [
                     'type' => StateInterface::TYPE_NORMAL,
                     'properties' => []
-                ]
+                ],
+                'goto-tavern' => [
+                    'type' => StateInterface::TYPE_NORMAL,
+                    'properties' => []
+                ],
             ],
             'transitions' => [
                 'waiting' => [
@@ -101,19 +101,24 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                         return $this->game->getTurn() >= 20;
                     }
                 ],
-                /*'hurted' => [
+                'hurted' => [
                     'from' => ['stay', 'goto-enemy'],
                     'to' => 'goto-tavern',
                     'guard' => function () {
                         $hero = $this->game->getHero();
 
-                            return $hero->getLife() < 30 && $hero->getGold() >= 2;
-                        }
-                    ],
-                    'healed' => [
-                        'from' => ['goto-tavern'],
-                        'to' => 'goto-enemy'
-                    ]*/
+                        return $hero->getLife() < 70 && $hero->getGold() >= 2;
+                    }
+                ],
+                'healed' => [
+                    'from' => ['goto-tavern'],
+                    'to' => 'goto-enemy',
+                    'guard' => function () {
+                        $hero = $this->game->getHero();
+
+                        return $hero->getLife() > 85;
+                    }
+                ]
             ]
         ];
         $loader = new ArrayLoader($data);
@@ -131,26 +136,20 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
      */
     protected function compute()
     {
-        $transitions = $this->stateMachine->getTransitions();
         if (self::DEBUG) {
-            echo $this->state.PHP_EOL;
+            $hero = $this->game->getHero();
+            echo 'Turn:'.$this->game->getTurn().' state:'.$this->state.' life:'.$hero->getLife().' gold:'.$hero->getGold().PHP_EOL;
         }
 
+        $transitions = $this->stateMachine->getCurrentState()->getTransitions();
         foreach ($transitions as $transition) {
-            if (self::DEBUG) {
-                echo 'check'.$transition.PHP_EOL;
-            }
             if ($this->stateMachine->can($transition)) {
                 if (self::DEBUG) {
-                    echo 'apply'.PHP_EOL;
+                    echo '>> apply '.$transition.PHP_EOL;
                 }
                 $this->stateMachine->apply($transition);
                 break;
             }
-        }
-
-        if (self::DEBUG) {
-            echo PHP_EOL.$this->state.PHP_EOL;
         }
 
         if ($this->state === 'waiting') {
@@ -173,6 +172,9 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
         } elseif ($this->state === 'goto-tavern') {
             $taverns = $this->game->getTaverns();
             $target = current($taverns);
+            if (self::DEBUG) {
+                echo 'tavern:'.$target->getPosX().':'.$target->getPosY().' hero:'.$hero->getPosX().':'.$hero->getPosY().PHP_EOL;
+            }
         }
 
         return $target;

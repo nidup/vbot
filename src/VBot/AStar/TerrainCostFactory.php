@@ -36,7 +36,13 @@ class TerrainCostFactory
         $cost = [];
         $rowCost = [];
         foreach ($tiles as $tile) {
-            $rowCost[]= ($tile === self::IMPASSABLE_WOOD || $tile === self::TAVERN) ? PHP_INT_MAX : 1;
+            if ($tile === self::IMPASSABLE_WOOD) {
+                $rowCost[]= PHP_INT_MAX;
+            } elseif ($tile === self::TAVERN) {
+                $rowCost[]= 6;
+            } else {
+                $rowCost[]= 1;
+            }
             if (++$indX % $size === 0) {
                 $cost[]= $rowCost;
                 $rowCost = [];
