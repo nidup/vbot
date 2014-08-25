@@ -103,4 +103,12 @@ class Hero implements DestinationInterface
     {
         return $this->life;
     }
+
+    /**
+     * @return boolean
+     */
+    public function isCrashed()
+    {
+        return $this->crashed;
+    }
 }

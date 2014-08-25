@@ -81,7 +81,7 @@ class Board
             if ($tile === self::TAVERN) {
                 $this->taverns[]= new Tavern($indX, $indY);
             } elseif (strpos($tile, '$') !== false) {
-                $this->mines[]= new Mine($indX, $indY);
+                $this->mines[]= new Mine($indX, $indY, $tile[1]);
             }
             if (++$indY % $this->size === 0) {
                 $indX++;

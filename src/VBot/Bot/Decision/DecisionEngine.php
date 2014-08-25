@@ -18,7 +18,7 @@ use Finite\Loader\ArrayLoader;
 class DecisionEngine implements DecisionEngineInterface, StatefulInterface
 {
     /** @var boolean */
-    const DEBUG = true;
+    const DEBUG = false;
 
     /** @var Game */
     protected $game;
@@ -96,6 +96,10 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                     'type' => StateInterface::TYPE_NORMAL,
                     'properties' => []
                 ],
+                'dead' => [
+                    'type' => StateInterface::TYPE_FINAL,
+                    'properties' => []
+                ]
             ],
             'transitions' => [
                 'waiting' => [
@@ -107,13 +111,13 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                         return $this->game->getTurn() >= 20;
                     }*/
                 ],
-                'steal-mine' => [
+                'defend-mine' => [
                     'from' => ['goto-mine'],
                     'to' => 'goto-enemy',
                     'guard' => function () {
                         $hero = $this->game->getHero();
 
-                        return $hero->getMineCount() > 0;
+                        return $hero->getMineCount() > 1;
                     }
                 ],
                 'hurted' => [
@@ -122,7 +126,7 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                     'guard' => function () {
                         $hero = $this->game->getHero();
 
-                        return $hero->getLife() < 70 && $hero->getGold() >= 2;
+                        return $hero->getLife() < 60 && $hero->getGold() >= 2;
                     }
                 ],
                 'healed' => [
@@ -132,6 +136,15 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                         $hero = $this->game->getHero();
 
                         return $hero->getLife() > 85;
+                    }
+                ],
+                'dying' => [
+                    'from' => ['stay', 'goto-mine', 'goto-tavern', 'goto-enemy'],
+                    'to' => 'dead',
+                    'guard' => function () {
+                        $hero = $this->game->getHero();
+
+                        return $hero->isCrashed();
                     }
                 ]
             ]
@@ -167,6 +180,12 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
             }
         }
 
+        if ($this->state === 'dead') {
+            echo '>> RIP'.PHP_EOL;
+
+            return null;
+        }
+
         if ($this->state === 'stay') {
             return null;
         }
@@ -186,6 +205,7 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
 
         } elseif ($this->state === 'goto-tavern') {
             $taverns = $this->game->getTaverns();
+            // TODO closer
             $target = current($taverns);
             if (self::DEBUG) {
                 echo 'tavern:'.$target->getPosX().':'.$target->getPosY().' hero:'.$hero->getPosX().':'.$hero->getPosY().PHP_EOL;
@@ -193,7 +213,13 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
 
         } elseif ($this->state === 'goto-mine') {
             $mines = $this->game->getMines();
-            $target = current($mines);
+            // TODO closer
+            foreach ($mines as $mine) {
+                if ($mine->getOwnerId() !== $this->game->getHero()->getId()) {
+                    $target = $mine;
+                    break;
+                }
+            }
             if (self::DEBUG) {
                 echo 'mine:'.$target->getPosX().':'.$target->getPosY().' hero:'.$hero->getPosX().':'.$hero->getPosY().PHP_EOL;
             }
