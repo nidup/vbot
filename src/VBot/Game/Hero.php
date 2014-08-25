@@ -87,4 +87,20 @@ class Hero
     {
         return $this->mineCount;
     }
+
+    /**
+     * @return integer
+     */
+    public function getGold()
+    {
+        return $this->gold;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getLife()
+    {
+        return $this->life;
+    }
 }

@@ -15,6 +15,13 @@ class Board
     /** @var string */
     protected $tiles;
 
+    /** @var Tavern[] */
+    protected $taverns = null;
+
+    /** @varstatic string */
+    // TODO : avoid to duplicate constants
+    const TAVERN = '[]';
+
     /**
      * @param array $boardData
      */
@@ -38,5 +45,25 @@ class Board
     public function getSize()
     {
         return $this->size;
+    }
+
+    public function getTaverns()
+    {
+        if ($this->taverns === null) {
+            $this->taverns = [];
+            $tiles = str_split($this->tiles, 2);
+            $indX = 0;
+            $indY = 0;
+            foreach ($tiles as $tile) {
+                if ($tile === self::TAVERN) {
+                    $this->taverns[]= new Tavern($indX, $indY);
+                }
+                if (++$indX % $this->size === 0) {
+                    $indY++;
+                }
+            }
+        }
+
+        return $this->taverns;
     }
 }

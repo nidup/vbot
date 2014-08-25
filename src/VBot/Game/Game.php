@@ -109,4 +109,12 @@ class Game
     {
         return $this->turn;
     }
+
+    /**
+     * @return Tavern[]
+     */
+    public function getTaverns()
+    {
+        return $this->board->getTaverns();
+    }
 }

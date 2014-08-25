@@ -37,7 +37,7 @@ class RunTrainingCommand extends Command
         $output->writeln('Run a Vindinium training');
         $output->writeln('');
 
-        $bot = new Bot\ThiefBot();
+        $bot = new Bot\FSMBot();
 
         $client = new Client(
             $bot,

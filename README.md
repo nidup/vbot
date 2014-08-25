@@ -7,9 +7,11 @@ Inspired by git@github.com:kcampion/vindinium-starter-php.git
 
     New command option to choose map
     use Guzzle for HTTP Client
-    A* lib for hero moving cf https://github.com/jmgq/php-a-star ?
-    FSM based Bot cf https://github.com/yohang/Finite ?
-    Use a model to represent game state, observer to update ?
+    [InProgress] A* lib for hero moving cf https://github.com/jmgq/php-a-star ?
+    [InProgress] FSM based Bot cf https://github.com/yohang/Finite ?
+    [InProgress] Use a model to represent game state, observer to update ?
+    Use collection for heroes, mines, taverns
+    Use Symfony Expression Language
     Store states, games
 
 ## Libraries deps:
