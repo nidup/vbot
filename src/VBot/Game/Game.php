@@ -117,4 +117,12 @@ class Game
     {
         return $this->board->getTaverns();
     }
+
+    /**
+     * @return Mine[]
+     */
+    public function getMines()
+    {
+        return $this->board->getMines();
+    }
 }

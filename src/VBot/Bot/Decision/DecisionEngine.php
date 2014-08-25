@@ -84,6 +84,10 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                     'type' => StateInterface::TYPE_INITIAL,
                     'properties' => []
                 ],
+                'goto-mine' => [
+                    'type' => StateInterface::TYPE_NORMAL,
+                    'properties' => []
+                ],
                 'goto-enemy' => [
                     'type' => StateInterface::TYPE_NORMAL,
                     'properties' => []
@@ -96,13 +100,24 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
             'transitions' => [
                 'waiting' => [
                     'from' => ['stay'],
-                    'to' => 'goto-enemy',
+                    'to' => 'goto-mine',
+                    /*
+                     TODO : don't way anymore, get a mine then attack
                     'guard' => function () {
                         return $this->game->getTurn() >= 20;
+                    }*/
+                ],
+                'steal-mine' => [
+                    'from' => ['goto-mine'],
+                    'to' => 'goto-enemy',
+                    'guard' => function () {
+                        $hero = $this->game->getHero();
+
+                        return $hero->getMineCount() > 0;
                     }
                 ],
                 'hurted' => [
-                    'from' => ['stay', 'goto-enemy'],
+                    'from' => ['stay', 'goto-enemy', 'goto-mine'],
                     'to' => 'goto-tavern',
                     'guard' => function () {
                         $hero = $this->game->getHero();
@@ -152,7 +167,7 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
             }
         }
 
-        if ($this->state === 'waiting') {
+        if ($this->state === 'stay') {
             return null;
         }
 
@@ -174,6 +189,13 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
             $target = current($taverns);
             if (self::DEBUG) {
                 echo 'tavern:'.$target->getPosX().':'.$target->getPosY().' hero:'.$hero->getPosX().':'.$hero->getPosY().PHP_EOL;
+            }
+
+        } elseif ($this->state === 'goto-mine') {
+            $mines = $this->game->getMines();
+            $target = current($mines);
+            if (self::DEBUG) {
+                echo 'mine:'.$target->getPosX().':'.$target->getPosY().' hero:'.$hero->getPosX().':'.$hero->getPosY().PHP_EOL;
             }
         }
 

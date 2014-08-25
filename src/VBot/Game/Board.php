@@ -18,6 +18,9 @@ class Board
     /** @var Tavern[] */
     protected $taverns = null;
 
+    /** @var Mine[] */
+    protected $mines = null;
+
     /** @varstatic string */
     // TODO : avoid to duplicate constants
     const TAVERN = '[]';
@@ -29,6 +32,7 @@ class Board
     {
         $this->size = (int) $boardData['size'];
         $this->tiles = $boardData['tiles'];
+        $this->parseTiles();
     }
 
     /**
@@ -47,24 +51,42 @@ class Board
         return $this->size;
     }
 
+    /**
+     * @return Tavern[]
+     */
     public function getTaverns()
     {
-        if ($this->taverns === null) {
-            $this->taverns = [];
-            $tiles = str_split($this->tiles, 2);
-            $indX = 0;
-            $indY = 0;
-            foreach ($tiles as $tile) {
-                if ($tile === self::TAVERN) {
-                    $this->taverns[]= new Tavern($indX, $indY);
-                }
-                if (++$indY % $this->size === 0) {
-                    $indX++;
-                    $indY = 0;
-                }
+        return $this->taverns;
+    }
+
+    /**
+     * @return Mine[]
+     */
+    public function getMines()
+    {
+        return $this->mines;
+    }
+
+    /**
+     * Parse the tiles to detect mines and taverns
+     */
+    protected function parseTiles()
+    {
+        $this->taverns = [];
+        $this->mines = [];
+        $tiles = str_split($this->tiles, 2);
+        $indX = 0;
+        $indY = 0;
+        foreach ($tiles as $tile) {
+            if ($tile === self::TAVERN) {
+                $this->taverns[]= new Tavern($indX, $indY);
+            } elseif (strpos($tile, '$') !== false) {
+                $this->mines[]= new Mine($indX, $indY);
+            }
+            if (++$indY % $this->size === 0) {
+                $indX++;
+                $indY = 0;
             }
         }
-
-        return $this->taverns;
     }
 }
