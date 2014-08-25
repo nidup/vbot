@@ -113,44 +113,42 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                 'waiting' => [
                     'from' => ['stay'],
                     'to' => 'goto-mine',
+                    'expression' => [
+                        'condition' => 'true',
+                        'action' => ''
+                    ],
                 ],
                 'defend-mine' => [
                     'from' => ['goto-mine'],
                     'to' => 'goto-enemy',
+                    'expression' => [
+                        'condition' => 'hero.getMineCount() > 1',
+                        'action' => ''
+                    ],
                 ],
                 'hurted' => [
                     'from' => ['stay', 'goto-enemy', 'goto-mine'],
                     'to' => 'goto-tavern',
+                    'expression' => [
+                        'condition'   => 'hero.getLife() < 50 && hero.getGold() >= 2',
+                        'action' => ''
+                    ],
                 ],
                 'healed' => [
                     'from' => ['goto-tavern'],
                     'to' => 'goto-enemy',
+                    'expression' => [
+                        'condition'   => 'hero.getLife() > 85',
+                        'action' => ''
+                    ],
                 ],
                 'dying' => [
                     'from' => ['stay', 'goto-mine', 'goto-tavern', 'goto-enemy'],
                     'to' => 'dead',
-                ]
-            ],
-            'expressions' => [
-                'waiting' => [
-                    'condition' => 'true',
-                    'action' => ''
-                ],
-                'defend-mine' => [
-                    'condition' => 'hero.getMineCount() > 1',
-                    'action' => ''
-                ],
-                'hurted' => [
-                    'condition'   => 'hero.getLife() < 50 && hero.getGold() >= 2',
-                    'action' => ''
-                ],
-                'healed' => [
-                    'condition'   => 'hero.getLife() > 85',
-                    'action' => ''
-                ],
-                'dying' => [
-                    'condition'   => 'hero.isCrashed()',
-                    'action' => ''
+                    'expression' => [
+                        'condition'   => 'hero.isCrashed()',
+                        'action' => ''
+                    ]
                 ]
             ]
         ];
