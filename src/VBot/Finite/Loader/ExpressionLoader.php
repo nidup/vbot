@@ -86,50 +86,24 @@ class ExpressionLoader implements LoaderInterface
     protected function loadTransitions(StateMachineInterface $stateMachine)
     {
         $resolver = new OptionsResolver();
-        $resolver->setRequired(['from', 'to', 'expression']);
+        $resolver->setRequired(['from', 'to', 'condition']);
         $resolver->setNormalizers(['from' => function (Options $options, $v) { return (array) $v; }]);
+        $language = new ExpressionLanguage();
 
         foreach ($this->config['transitions'] as $transition => $config) {
             $config = $resolver->resolve($config);
             $stateMachine->addTransition(new Transition($transition, $config['from'], $config['to']));
-            $this->addTransitionListener($stateMachine, $transition, $config['expression']);
-        }
-    }
-
-    /**
-     * @param StateMachineInterface $stateMachine
-     * @param string                $transition
-     * @param array                 $config
-     */
-    protected function addTransitionListener(StateMachineInterface $stateMachine, $transition, $config)
-    {
-        $resolver = new OptionsResolver();
-        $resolver->setRequired(['action', 'condition']);
-        $config = $resolver->resolve($config);
-
-        // TODO same instance of EL ?
-        $language = new ExpressionLanguage();
-        $stateMachine->getDispatcher()->addListener(
-            'finite.test_transition.'.$transition,
-            function (TransitionEvent $event) use ($language, $config) {
-                $object = $event->getStateMachine()->getObject();
-                $game = $object->getGame();
-                $hero = $game->getHero();
-                if ($language->evaluate($config['condition'], ['hero' => $hero]) === false) {
-                    $event->reject();
-                } else {
-                    $target = $language->evaluate(
-                        $config['action'],
-                        ['game' => $game, 'hero' => $hero]
-                    );
-                    //var_dump($event->getTransition()->getName());
-                    //var_dump($target);
-                    $object->setTarget($target);
-
-                    // TODO : execute action
-                    // TODO : move to apply listener !!
+            $stateMachine->getDispatcher()->addListener(
+                'finite.test_transition.'.$transition,
+                function (TransitionEvent $event) use ($language, $config) {
+                    $object = $event->getStateMachine()->getObject();
+                    $game = $object->getGame();
+                    $hero = $game->getHero();
+                    if ($language->evaluate($config['condition'], ['hero' => $hero]) === false) {
+                        $event->reject();
+                    }
                 }
-            }
-        );
+            );
+        }
     }
 }

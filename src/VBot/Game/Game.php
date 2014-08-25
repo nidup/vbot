@@ -163,6 +163,7 @@ class Game
      */
     public function getEnemyWithMoreMines()
     {
+        // TODO : if less gold and les mine than hero avoid to attack
         // TODO : a enemy class + inject extra deps/utils in Hero (Astar?)
         // TODO : use collections with custom sorters
         $enemies = $this->getEnemies();

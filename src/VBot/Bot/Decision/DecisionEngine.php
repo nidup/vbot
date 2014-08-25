@@ -9,6 +9,7 @@ use Finite\StatefulInterface;
 use Finite\State\State;
 use Finite\State\StateInterface;
 use Finite\StateMachine\StateMachine;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
  * Decision engine
@@ -29,9 +30,6 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
     /** @var StateMachine $stateMachine */
     protected $stateMachine = null;
 
-    /** @var DestinationInterface $target */
-    protected $target = null;
-
     /**
      * {@inheritDoc}
      */
@@ -39,9 +37,9 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
     {
         $this->updateGame($game);
         $this->loadStateMachine();
-        $this->compute();
+        $target = $this->compute();
 
-        return $this->target;
+        return $target;
     }
 
     /**
@@ -66,14 +64,6 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
     public function getGame()
     {
         return $this->game;
-    }
-
-    /**
-     * @param DestinationInterface|null
-     */
-    public function setTarget($destination)
-    {
-        $this->target = $destination;
     }
 
     /**
@@ -105,15 +95,21 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                 ],
                 'goto-mine' => [
                     'type' => StateInterface::TYPE_NORMAL,
-                    'properties' => []
+                    'properties' => [
+                        'target' => 'game.getClosestNotOwnedMine(hero)'
+                    ]
                 ],
                 'goto-enemy' => [
                     'type' => StateInterface::TYPE_NORMAL,
-                    'properties' => []
+                    'properties' => [
+                        'target' => 'game.getEnemyWithMoreMines()'
+                    ]
                 ],
                 'goto-tavern' => [
                     'type' => StateInterface::TYPE_NORMAL,
-                    'properties' => []
+                    'properties' => [
+                        'target' => 'game.getClosestTavern(hero)'
+                    ]
                 ],
                 'dead' => [
                     'type' => StateInterface::TYPE_FINAL,
@@ -124,42 +120,27 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                 'waiting' => [
                     'from' => ['stay'],
                     'to' => 'goto-mine',
-                    'expression' => [
-                        'condition' => 'true',
-                        'action' => 'game.getClosestNotOwnedMine(hero)'
-                    ],
+                    'condition' => 'true',
                 ],
                 'defend-mine' => [
                     'from' => ['goto-mine'],
                     'to' => 'goto-enemy',
-                    'expression' => [
-                        'condition' => 'hero.getMineCount() > 0',
-                        'action' => 'game.getEnemyWithMoreMines()'
-                    ],
+                    'condition' => 'hero.getMineCount() > 1',
                 ],
                 'hurted' => [
                     'from' => ['stay', 'goto-enemy', 'goto-mine'],
                     'to' => 'goto-tavern',
-                    'expression' => [
-                        'condition' => 'hero.getLife() < 50 && hero.getGold() >= 2',
-                        'action' => 'game.getClosestTavern(hero)'
-                    ],
+                    'condition' => 'hero.getLife() < 50 && hero.getGold() >= 2',
                 ],
                 'healed' => [
                     'from' => ['goto-tavern'],
                     'to' => 'goto-enemy',
-                    'expression' => [
-                        'condition'   => 'hero.getLife() > 85',
-                        'action' => 'game.getEnemyWithMoreMines()'
-                    ],
+                    'condition' => 'hero.getLife() > 85',
                 ],
                 'dying' => [
                     'from' => ['stay', 'goto-mine', 'goto-tavern', 'goto-enemy'],
                     'to' => 'dead',
-                    'expression' => [
-                        'condition'   => 'hero.isCrashed()',
-                        'action' => 'null'
-                    ]
+                    'condition' => 'hero.isCrashed()',
                 ]
             ]
         ];
@@ -172,15 +153,15 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
     }
 
     /**
-     * Compute transitions to update the target
+     * Compute transitions to retrieve the target
      *
-     * @return null
+     * @return DestinationInterface|null
      */
     protected function compute()
     {
         if (self::DEBUG) {
             $hero = $this->game->getHero();
-            echo 'Turn:'.$this->game->getTurn().' state:'.$this->state.' life:'.$hero->getLife().' gold:'.$hero->getGold().PHP_EOL;
+            echo 'Turn:'.$this->game->getTurn().' state:'.$this->state.' life:'.$hero->getLife().' gold:'.$hero->getGold().' Pos x:y'.$hero->getPosX().':'.$hero->getPosY();
         }
 
         $transitions = $this->stateMachine->getCurrentState()->getTransitions();
@@ -194,5 +175,23 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
                 break;
             }
         }
+
+        $currentState = $this->stateMachine->getCurrentState();
+        if ($currentState->has('target')) {
+            $targetExpression = $currentState->get('target');
+            $language = new ExpressionLanguage();
+            $target = $language->evaluate(
+                $targetExpression,
+                ['game' => $this->game, 'hero' => $this->game->getHero()]
+            );
+
+            if (self::DEBUG && $target) {
+                echo ' Targ x:y'.$target->getPosX().':'.$target->getPosY().PHP_EOL;
+            }
+
+            return $target;
+        }
+
+        return null;
     }
 }
