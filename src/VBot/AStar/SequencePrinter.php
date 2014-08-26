@@ -12,10 +12,10 @@ class SequencePrinter
     private $padToken = ' ';
 
     /**
-     * @param TerrainCost $terrainCost
-     * @param Node[]      $sequence
+     * @param integer[] $terrainCost
+     * @param Node[]    $sequence
      */
-    public function __construct(TerrainCost $terrainCost, array $sequence)
+    public function __construct($terrainCost, array $sequence)
     {
         $this->terrainCost = $terrainCost;
         $this->sequence = $sequence;
@@ -107,9 +107,9 @@ class SequencePrinter
     {
         $emptyTile = $this->getTile($this->getEmptyTileToken());
 
-        $emptyRow = array_fill(0, $this->terrainCost->getTotalColumns(), $emptyTile);
+        $emptyRow = array_fill(0, count($this->terrainCost[0]), $emptyTile);
 
-        $board = array_fill(0, $this->terrainCost->getTotalRows(), $emptyRow);
+        $board = array_fill(0, count($this->terrainCost), $emptyRow);
 
         return $board;
     }

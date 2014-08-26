@@ -4,7 +4,6 @@ namespace VBot\Game;
 
 use VBot\AStar\Node;
 use VBot\AStar\PathFinder;
-use VBot\AStar\TerrainCost;
 
 /**
  * Board model
@@ -28,7 +27,7 @@ class Board
     /** @var Mine[] */
     protected $mines = null;
 
-    /** @var TerrainCost */
+    /** @var integer[] */
     protected $terrainCost = null;
 
     /** @varstatic string */
@@ -161,6 +160,6 @@ class Board
                 $rowCost = [];
             }
         }
-        $this->terrainCost = new TerrainCost($cost);
+        $this->terrainCost = $cost;
     }
 }
