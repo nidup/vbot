@@ -48,11 +48,11 @@ class MyAStar extends AStar
      */
     public function calculateRealCost(Node $node, Node $adjacent)
     {
-        $myStartNode = MyNode::fromNode($node);
-        $myEndNode = MyNode::fromNode($adjacent);
+        $areAdjacent = abs($node->getRow() - $adjacent->getRow()) <= 1
+            && abs($node->getColumn() - $adjacent->getColumn()) <= 1;
 
-        if ($this->areAdjacent($myStartNode, $myEndNode)) {
-            return $this->terrainCost->getCost($myEndNode->getRow(), $myEndNode->getColumn());
+        if ($areAdjacent) {
+            return $this->terrainCost->getCost($adjacent->getRow(), $adjacent->getColumn());
         }
 
         return TerrainCost::INFINITE;
@@ -63,19 +63,11 @@ class MyAStar extends AStar
      */
     public function calculateEstimatedCost(Node $start, Node $end)
     {
-        $myStartNode = MyNode::fromNode($start);
-        $myEndNode = MyNode::fromNode($end);
-
-        $rowFactor = pow($myStartNode->getRow() - $myEndNode->getRow(), 2);
-        $columnFactor = pow($myStartNode->getColumn() - $myEndNode->getColumn(), 2);
+        $rowFactor = pow($start->getRow() - $end->getRow(), 2);
+        $columnFactor = pow($start->getColumn() - $end->getColumn(), 2);
 
         $euclideanDistance = sqrt($rowFactor + $columnFactor);
 
         return $euclideanDistance;
-    }
-
-    private function areAdjacent(MyNode $a, MyNode $b)
-    {
-        return abs($a->getRow() - $b->getRow()) <= 1 && abs($a->getColumn() - $b->getColumn()) <= 1;
     }
 }

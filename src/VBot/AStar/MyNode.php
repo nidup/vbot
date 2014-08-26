@@ -106,24 +106,6 @@ class MyNode implements Node
         return $this->hScore;
     }
 
-    /**
-     * @param  Node   $node
-     * @return MyNode
-     */
-    public static function fromNode(Node $node)
-    {
-        $rowAndColumn = explode('x', $node->getID());
-
-        if (count($rowAndColumn) != 2) {
-            throw new \InvalidArgumentException('Invalid node: ' . print_r($node, true));
-        }
-
-        $row = $rowAndColumn[0];
-        $column = $rowAndColumn[1];
-
-        return new MyNode($row, $column);
-    }
-
     public function getRow()
     {
         return $this->row;
