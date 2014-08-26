@@ -13,7 +13,7 @@ class SequencePrinter
 
     /**
      * @param TerrainCost $terrainCost
-     * @param MyNode[]    $sequence
+     * @param Node[]      $sequence
      */
     public function __construct(TerrainCost $terrainCost, array $sequence)
     {

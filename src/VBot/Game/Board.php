@@ -2,7 +2,7 @@
 
 namespace VBot\Game;
 
-use VBot\AStar\MyNode;
+use VBot\AStar\Node;
 use VBot\AStar\PathFinder;
 use VBot\AStar\TerrainCost;
 
@@ -112,8 +112,8 @@ class Board
      */
     public function getShortestPath(DestinationInterface $start, DestinationInterface $destination)
     {
-        $start = new MyNode($start->getPosX(), $start->getPosY());
-        $destination = new MyNode($destination->getPosX(), $destination->getPosY());
+        $start = new Node($start->getPosX(), $start->getPosY());
+        $destination = new Node($destination->getPosX(), $destination->getPosY());
         $aStar = new PathFinder($this->terrainCost);
         $path = $aStar->run($start, $destination);
 

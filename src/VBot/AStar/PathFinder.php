@@ -2,12 +2,8 @@
 
 namespace VBot\AStar;
 
-use JMGQ\AStar\Node;
-use JMGQ\AStar\NodeList;
-use JMGQ\AStar\Algorithm;
-
 /**
- * Path finder, inspirate from git@github.com:jmgq/php-a-star.git
+ * Path finder, forked from git@github.com:jmgq/php-a-star.git
  * We don't use this library due to performance issues on big graphes
  *
  * @author Nicolas Dupont <nicolas@akeneo.com>
@@ -43,19 +39,19 @@ class PathFinder
 
         // top
         if ($node->getRow() > 0) {
-            $adjacentNodes[]= new MyNode($node->getRow() - 1, $node->getColumn());
+            $adjacentNodes[]= new Node($node->getRow() - 1, $node->getColumn());
         }
         // bottom
         if ($node->getRow() < $this->terrainCost->getTotalRows() - 1) {
-            $adjacentNodes[]= new MyNode($node->getRow() + 1, $node->getColumn());
+            $adjacentNodes[]= new Node($node->getRow() + 1, $node->getColumn());
         }
         // left
         if ($node->getColumn() > 0) {
-            $adjacentNodes[]= new MyNode($node->getRow(), $node->getColumn() - 1);
+            $adjacentNodes[]= new Node($node->getRow(), $node->getColumn() - 1);
         }
         // right
         if ($node->getColumn() < $this->terrainCost->getTotalColumns() - 1) {
-            $adjacentNodes[]= new MyNode($node->getRow(), $node->getColumn() + 1);
+            $adjacentNodes[]= new Node($node->getRow(), $node->getColumn() + 1);
         }
 
         return $adjacentNodes;
@@ -99,8 +95,8 @@ class PathFinder
     }
 
     /**
-     * @param Node $start
-     * @param Node $goal
+     * @param  Node   $start
+     * @param  Node   $goal
      * @return Node[]
      */
     public function run(Node $start, Node $goal)

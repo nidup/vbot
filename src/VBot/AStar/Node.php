@@ -2,46 +2,48 @@
 
 namespace VBot\AStar;
 
-use JMGQ\AStar\AbstractNode;
-use JMGQ\AStar\Node;
-
-// Quick attempt from git@github.com:jmgq/php-a-star.git
-class MyNode implements Node
+/**
+ * Node, forked from git@github.com:jmgq/php-a-star.git
+ * We don't use this library due to performance issues on big graphes
+ *
+ * @author Nicolas Dupont <nicolas@akeneo.com>
+ */
+class Node
 {
-    private $parent;
-    private $children = array();
+    /** @var Node */
+    protected $parent;
 
-    private $gScore;
-    private $hScore;
+    /** @var Node[] */
+    protected $children = array();
 
-    private $row;
-    private $column;
+    protected $gScore;
+    protected $hScore;
 
+    /** @var integer */
+    protected $row;
+
+    /** @var integer */
+    protected $column;
+
+    /**
+     * Constructor with row and column
+     */
     public function __construct($row, $column)
     {
         $this->row = $row;
         $this->column = $column;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function setParent(Node $parent)
     {
         $this->parent = $parent;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getParent()
     {
         return $this->parent;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function addChild(Node $child)
     {
         $child->setParent($this);
@@ -49,26 +51,16 @@ class MyNode implements Node
         $this->children[] = $child;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getChildren()
     {
         return $this->children;
     }
 
-    /**
-     * @inheritdoc
-     * NOTE : avoid to inherit from AbstractNode tue to avoid perfomance hit on this one
-     */
     public function getF()
     {
         return $this->gScore + $this->hScore;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function setG($score)
     {
         if (!is_numeric($score)) {
@@ -78,17 +70,11 @@ class MyNode implements Node
         $this->gScore = $score;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getG()
     {
         return $this->gScore;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function setH($score)
     {
         if (!is_numeric($score)) {
@@ -98,9 +84,6 @@ class MyNode implements Node
         $this->hScore = $score;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getH()
     {
         return $this->hScore;
@@ -116,9 +99,6 @@ class MyNode implements Node
         return $this->column;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getID()
     {
         return $this->row . 'x' . $this->column;
