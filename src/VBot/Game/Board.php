@@ -129,6 +129,7 @@ class Board
      * Parse the tiles to detect mines and taverns
      *
      * TODO : different terrain costs as shortest, safest
+     * TODO : cost depends on map size and configuration
      */
     protected function parseTiles()
     {
@@ -143,11 +144,13 @@ class Board
             if ($tile === self::IMPASSABLE_WOOD) {
                 $rowCost[]= PHP_INT_MAX;
             } elseif ($tile === self::TAVERN) {
-                $rowCost[]= 6;
+                $rowCost[]= 50;
                 $this->taverns[]= new Tavern($indX, $indY);
             } elseif (strpos($tile, '$') !== false) {
-                $rowCost[]= 1;
+                $rowCost[]= 50;
                 $this->mines[]= new Mine($indX, $indY, $tile[1]);
+            } elseif (strpos($tile, '@') !== false) {
+                $rowCost[]= 5;
             } else {
                 $rowCost[]= 1;
             }
