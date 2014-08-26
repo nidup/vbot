@@ -4,7 +4,6 @@ namespace VBot\Bot\Move;
 
 use VBot\Game\DestinationInterface;
 use VBot\Game\Board;
-use VBot\AStar;
 
 /**
  * Move engine interface
@@ -13,51 +12,37 @@ use VBot\AStar;
  */
 class MoveEngine implements MoveEngineInterface
 {
-    /** @var boolean */
-    const DEBUG = false;
-
     /**
      * {@inheritDoc}
      */
     public function move(Board $board, DestinationInterface $start, DestinationInterface $target)
     {
-        $myPosX = $start->getPosX();
-        $myPosY = $start->getPosY();
-        $terrainCostFactory = new AStar\TerrainCostFactory();
-        $terrainCost = $terrainCostFactory->create($board);
-        $start = new AStar\MyNode($myPosX, $myPosY);
-        $goal = new AStar\MyNode($target->getPosX(), $target->getPosY());
-        $aStar = new AStar\MyAStar($terrainCost);
-        $solution = $aStar->run($start, $goal);
-
-        if (self::DEBUG) {
-            $printer = new AStar\SequencePrinter($terrainCost, $solution);
-            $printer->printSequence();
-        }
-
-        if (!isset($solution[1])) {
+        $path = $board->getShortestPath($start, $target);
+        if (!isset($path[1])) {
             return 'Stay';
         }
 
-        $firstNode = $solution[1];
+        $myPosX = $start->getPosX();
+        $myPosY = $start->getPosY();
+
+        $firstNode = $path[1];
         $destX = (int) $firstNode->getRow();
         $destY = (int) $firstNode->getColumn();
 
-        $destination = 'Stay';
-
+        $direction = 'Stay';
         if ($destX > $myPosX) {
-            $destination = 'South';
+            $direction = 'South';
 
         } elseif ($destX < $myPosX) {
-            $destination = 'North';
+            $direction = 'North';
 
         } elseif ($destY > $myPosY) {
-            $destination = 'East';
+            $direction = 'East';
 
         } elseif ($destY < $myPosY) {
-            $destination = 'West';
+            $direction = 'West';
         }
 
-        return $destination;
+        return $direction;
     }
 }

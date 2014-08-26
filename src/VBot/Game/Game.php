@@ -133,15 +133,14 @@ class Game
      */
     public function getClosestNotOwnedMine(Hero $hero)
     {
-        // TODO closest
-        $mines = $this->getMines();
-        foreach ($mines as $mine) {
+        $notOwnedMines = [];
+        foreach ($this->getMines() as $mine) {
             if ($mine->getOwnerId() !== $hero->getId()) {
-                return $mine;
+                $notOwnedMines[]= $mine;
             }
         }
 
-        return null;
+        return $this->board->getClosestDestination($hero, $notOwnedMines);
     }
 
     /**
@@ -152,10 +151,8 @@ class Game
     public function getClosestTavern(Hero $hero)
     {
         $taverns = $this->getTaverns();
-        // TODO closest
-        $target = current($taverns);
 
-        return $target;
+        return $this->board->getClosestDestination($hero, $taverns);
     }
 
     /**
