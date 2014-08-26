@@ -1,8 +1,10 @@
 <?php
 
-namespace VBot\Starter;
+namespace VBot\Client;
 
-// cf kcampion/vindinium-starter-php.git
+/**
+ * cf kcampion/vindinium-starter-php.git
+ */
 class HttpPost
 {
 

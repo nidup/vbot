@@ -1,14 +1,15 @@
 <?php
 
-namespace VBot\Starter;
+namespace VBot\Client;
 
 use VBot\Bot\BotInterface;
 use VBot\Game\Game;
 
-// cf kcampion/vindinium-starter-php.git
+/**
+ * cf kcampion/vindinium-starter-php.git
+ */
 class Client
 {
-
     const TIMEOUT = 15;
     private $bot;
     private $key;

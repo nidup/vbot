@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
-use VBot\Starter\Client;
+use VBot\Client\Client;
 use VBot\Bot\BotFactory;
 
 /**
