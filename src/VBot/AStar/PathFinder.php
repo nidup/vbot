@@ -4,7 +4,9 @@ namespace VBot\AStar;
 
 /**
  * Path finder, forked from git@github.com:jmgq/php-a-star.git
- * We don't use this library due to performance issues on big graphes
+ *
+ * We don't use this library due to performance issues on big graphes, mainly due to
+ * number of calls and use of objects, we simplied it and, unfortunately, make it less readable
  *
  * @author Nicolas Dupont <nicolas@akeneo.com>
  */
@@ -38,20 +40,20 @@ class PathFinder
         $adjacentNodes = array();
 
         // top
-        if ($node->getRow() > 0) {
-            $adjacentNodes[]= new Node($node->getRow() - 1, $node->getColumn());
+        if ($node->row > 0) {
+            $adjacentNodes[]= new Node($node->row - 1, $node->column);
         }
         // bottom
-        if ($node->getRow() < $this->terrainCost->getTotalRows() - 1) {
-            $adjacentNodes[]= new Node($node->getRow() + 1, $node->getColumn());
+        if ($node->row < $this->terrainCost->getTotalRows() - 1) {
+            $adjacentNodes[]= new Node($node->row + 1, $node->column);
         }
         // left
-        if ($node->getColumn() > 0) {
-            $adjacentNodes[]= new Node($node->getRow(), $node->getColumn() - 1);
+        if ($node->column > 0) {
+            $adjacentNodes[]= new Node($node->row, $node->column - 1);
         }
         // right
-        if ($node->getColumn() < $this->terrainCost->getTotalColumns() - 1) {
-            $adjacentNodes[]= new Node($node->getRow(), $node->getColumn() + 1);
+        if ($node->column < $this->terrainCost->getTotalColumns() - 1) {
+            $adjacentNodes[]= new Node($node->row, $node->column + 1);
         }
 
         return $adjacentNodes;
@@ -62,11 +64,11 @@ class PathFinder
      */
     public function calculateRealCost(Node $node, Node $adjacent)
     {
-        $areAdjacent = abs($node->getRow() - $adjacent->getRow()) <= 1
-            && abs($node->getColumn() - $adjacent->getColumn()) <= 1;
+        $areAdjacent = abs($node->row - $adjacent->row) <= 1
+            && abs($node->column - $adjacent->column) <= 1;
 
         if ($areAdjacent) {
-            return $this->terrainCost->getCost($adjacent->getRow(), $adjacent->getColumn());
+            return $this->terrainCost->getCost($adjacent->row, $adjacent->column);
         }
 
         return TerrainCost::INFINITE;
@@ -77,8 +79,8 @@ class PathFinder
      */
     public function calculateEstimatedCost(Node $start, Node $end)
     {
-        $rowFactor = pow($start->getRow() - $end->getRow(), 2);
-        $columnFactor = pow($start->getColumn() - $end->getColumn(), 2);
+        $rowFactor = pow($start->row - $end->row, 2);
+        $columnFactor = pow($start->column - $end->column, 2);
 
         $euclideanDistance = sqrt($rowFactor + $columnFactor);
 
@@ -105,26 +107,27 @@ class PathFinder
 
         $this->clear();
 
-        $start->setG(0);
-        $start->setH($this->calculateEstimatedCost($start, $goal));
+        $start->gScore = 0;
+        $start->hScore = $this->calculateEstimatedCost($start, $goal);
 
-        $this->openList[$start->getID()] = $start;
+        $this->openList[$start->id] = $start;
 
         while (!empty($this->openList)) {
 
             $currentNode = null;
             foreach ($this->openList as $node) {
-                if ($currentNode === null || $node->getF() < $currentNode->getF()) {
+                $nodeF = $node->gScore + $node->hScore;
+                if ($currentNode === null || $nodeF < ($currentNode->gScore + $currentNode->hScore)) {
                     $currentNode = $node;
                 }
             }
             if ($currentNode !== null) {
-                unset($this->openList[$currentNode->getID()]);
+                unset($this->openList[$currentNode->id]);
             }
 
-            $this->closedList[$currentNode->getID()] = $currentNode;
+            $this->closedList[$currentNode->id] = $currentNode;
 
-            if ($currentNode->getID() === $goal->getID()) {
+            if ($currentNode->id === $goal->id) {
                 $path = $this->generatePathFromStartNodeTo($currentNode);
                 break;
             }
@@ -132,25 +135,25 @@ class PathFinder
             $successors = $this->computeAdjacentNodes($currentNode, $goal);
 
             foreach ($successors as $successor) {
-                if (isset($this->openList[$successor->getID()])) {
-                    $successorInOpenList = $this->openList[$successor->getID()];
+                if (isset($this->openList[$successor->id])) {
+                    $successorInOpenList = $this->openList[$successor->id];
 
-                    if ($successor->getG() >= $successorInOpenList->getG()) {
+                    if ($successor->gScore >= $successorInOpenList->gScore) {
                         continue;
                     }
                 }
 
-                if (isset($this->closedList[$successor->getID()])) {
-                    $successorInClosedList = $this->closedList[$successor->getID()];
+                if (isset($this->closedList[$successor->id])) {
+                    $successorInClosedList = $this->closedList[$successor->id];
 
-                    if ($successor->getG() >= $successorInClosedList->getG()) {
+                    if ($successor->gScore >= $successorInClosedList->gScore) {
                         continue;
                     }
                 }
 
-                unset($this->closedList[$successor->getID()]);
+                unset($this->closedList[$successor->id]);
 
-                $this->openList[$successor->getID()]= $successor;
+                $this->openList[$successor->id]= $successor;
             }
         }
 
@@ -166,7 +169,7 @@ class PathFinder
         while ($currentNode !== null) {
             array_unshift($path, $currentNode);
 
-            $currentNode = $currentNode->getParent();
+            $currentNode = $currentNode->parent;
         }
 
         return $path;
@@ -177,9 +180,9 @@ class PathFinder
         $nodes = $this->generateAdjacentNodes($node);
 
         foreach ($nodes as $adjacentNode) {
-            $adjacentNode->setParent($node);
-            $adjacentNode->setG($node->getG() + $this->calculateRealCost($node, $adjacentNode));
-            $adjacentNode->setH($this->calculateEstimatedCost($adjacentNode, $goal));
+            $adjacentNode->parent = $node;
+            $adjacentNode->gScore = $node->gScore + $this->calculateRealCost($node, $adjacentNode);
+            $adjacentNode->hScore = $this->calculateEstimatedCost($adjacentNode, $goal);
         }
 
         return $nodes;

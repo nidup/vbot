@@ -4,26 +4,31 @@ namespace VBot\AStar;
 
 /**
  * Node, forked from git@github.com:jmgq/php-a-star.git
- * We don't use this library due to performance issues on big graphes
+ *
+ * We don't use this library due to performance issues on big graphes, mainly due to
+ * number of calls and use of objects, we simplied it and, unfortunately, make it less readable
  *
  * @author Nicolas Dupont <nicolas@akeneo.com>
  */
 class Node
 {
+    /** @var string */
+    public $id;
+
     /** @var Node */
-    protected $parent;
-
-    /** @var Node[] */
-    protected $children = array();
-
-    protected $gScore;
-    protected $hScore;
+    public $parent;
 
     /** @var integer */
-    protected $row;
+    public $gScore;
 
     /** @var integer */
-    protected $column;
+    public $hScore;
+
+    /** @var integer */
+    public $row;
+
+    /** @var integer */
+    public $column;
 
     /**
      * Constructor with row and column
@@ -32,61 +37,7 @@ class Node
     {
         $this->row = $row;
         $this->column = $column;
-    }
-
-    public function setParent(Node $parent)
-    {
-        $this->parent = $parent;
-    }
-
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    public function addChild(Node $child)
-    {
-        $child->setParent($this);
-
-        $this->children[] = $child;
-    }
-
-    public function getChildren()
-    {
-        return $this->children;
-    }
-
-    public function getF()
-    {
-        return $this->gScore + $this->hScore;
-    }
-
-    public function setG($score)
-    {
-        if (!is_numeric($score)) {
-            throw new \InvalidArgumentException('The G value is not a number');
-        }
-
-        $this->gScore = $score;
-    }
-
-    public function getG()
-    {
-        return $this->gScore;
-    }
-
-    public function setH($score)
-    {
-        if (!is_numeric($score)) {
-            throw new \InvalidArgumentException('The H value is not a number');
-        }
-
-        $this->hScore = $score;
-    }
-
-    public function getH()
-    {
-        return $this->hScore;
+        $this->id = $this->row.'x'.$this->column;
     }
 
     public function getRow()
@@ -97,10 +48,5 @@ class Node
     public function getColumn()
     {
         return $this->column;
-    }
-
-    public function getID()
-    {
-        return $this->row . 'x' . $this->column;
     }
 }
