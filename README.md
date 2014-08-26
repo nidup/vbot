@@ -3,7 +3,7 @@ Vindinium Bot
 
 ## About:
 
-A Vindinium Bot (http://vindinium.org/)
+A PHP Vindinium Bot (http://vindinium.org/)
 
 Started with git@github.com:kcampion/vindinium-starter-php.git
 

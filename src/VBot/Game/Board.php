@@ -2,9 +2,8 @@
 
 namespace VBot\Game;
 
-use VBot\AStar\MyNode;
-use VBot\AStar\MyAStar;
-use VBot\AStar\TerrainCost;
+use VBot\AStar\Node;
+use VBot\AStar\PathFinder;
 
 /**
  * Board model
@@ -28,7 +27,7 @@ class Board
     /** @var Mine[] */
     protected $mines = null;
 
-    /** @var TerrainCost */
+    /** @var integer[] */
     protected $terrainCost = null;
 
     /** @varstatic string */
@@ -112,9 +111,9 @@ class Board
      */
     public function getShortestPath(DestinationInterface $start, DestinationInterface $destination)
     {
-        $start = new MyNode($start->getPosX(), $start->getPosY());
-        $destination = new MyNode($destination->getPosX(), $destination->getPosY());
-        $aStar = new MyAStar($this->terrainCost);
+        $start = new Node($start->getPosX(), $start->getPosY());
+        $destination = new Node($destination->getPosX(), $destination->getPosY());
+        $aStar = new PathFinder($this->terrainCost);
         $path = $aStar->run($start, $destination);
 
         if (self::DEBUG) {
@@ -161,6 +160,6 @@ class Board
                 $rowCost = [];
             }
         }
-        $this->terrainCost = new TerrainCost($cost);
+        $this->terrainCost = $cost;
     }
 }
