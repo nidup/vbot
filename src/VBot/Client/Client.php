@@ -16,15 +16,17 @@ class Client
     private $mode;
     private $numberOfGames;
     private $numberOfTurns;
+    private $map;
     private $serverUrl = 'http://vindinium.org';
 
-    public function __construct(BotInterface $bot, $key, $mode = 'training', $nbTurns = 300, $nbGames = 1)
+    public function __construct(BotInterface $bot, $key, $mode = 'training', $nbTurns = 300, $nbGames = 1, $map = 'm1')
     {
         $this->bot = $bot;
         $this->key = $key;
         $this->mode = $mode;
         $this->numberOfTurns = $nbTurns;
         $this->numberOfGames = $nbGames;
+        $this->map = $map;
     }
 
     public function load()
@@ -66,7 +68,7 @@ class Client
         // Get a JSON from the server containing the current state of the game
         if ($this->mode == 'training') {
             // Don't pass the 'map' parameter if you want a random map
-            $params = array('key' => $this->key, 'turns' => $this->numberOfTurns, 'map' => 'm1');
+            $params = array('key' => $this->key, 'turns' => $this->numberOfTurns, 'map' => $this->map);
             $api_endpoint = '/api/training';
         } elseif ($this->mode == 'arena') {
             $params = array('key' => $this->key);

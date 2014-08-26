@@ -26,7 +26,8 @@ class RunTrainingCommand extends Command
             ->setName('run:training')
             ->setDescription('Run a Vindinium training')
             ->addArgument('key', InputArgument::REQUIRED, 'Secret user key')
-            ->addArgument('turns', InputArgument::REQUIRED, 'Number of turns');
+            ->addArgument('turns', InputArgument::REQUIRED, 'Number of turns')
+            ->addArgument('map', InputArgument::REQUIRED, 'Map to use (m1, m2, m3, m4, m5, m6)');
     }
 
     /**
@@ -47,7 +48,9 @@ class RunTrainingCommand extends Command
             $bot,
             $input->getArgument('key'),
             'training',
-            $input->getArgument('turns')
+            $input->getArgument('turns'),
+            1,
+            $input->getArgument('map')
         );
         $client->load();
     }
