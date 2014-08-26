@@ -3,7 +3,7 @@
 namespace VBot\Game;
 
 use VBot\AStar\MyNode;
-use VBot\AStar\MyAStar;
+use VBot\AStar\MyAlgorithm;
 use VBot\AStar\TerrainCost;
 
 /**
@@ -114,7 +114,7 @@ class Board
     {
         $start = new MyNode($start->getPosX(), $start->getPosY());
         $destination = new MyNode($destination->getPosX(), $destination->getPosY());
-        $aStar = new MyAStar($this->terrainCost);
+        $aStar = new MyAlgorithm($this->terrainCost);
         $path = $aStar->run($start, $destination);
 
         if (self::DEBUG) {

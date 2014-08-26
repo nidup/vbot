@@ -2,17 +2,19 @@
 
 namespace VBot\AStar;
 
-use JMGQ\AStar\AStar;
 use JMGQ\AStar\Node;
+use JMGQ\AStar\Algorithm;
 
 // Quick attempt from git@github.com:jmgq/php-a-star.git
-class MyAStar extends AStar
+// Not use callback algorithm due to extensible use of call user func
+class MyAlgorithm extends Algorithm
 {
     private $terrainCost;
 
     public function __construct(TerrainCost $terrainCost)
     {
         $this->terrainCost = $terrainCost;
+        parent::__construct();
     }
 
     /**
