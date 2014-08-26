@@ -22,23 +22,22 @@ class MyAStar extends AStar
     public function generateAdjacentNodes(Node $node)
     {
         $adjacentNodes = array();
-        $myNode = MyNode::fromNode($node);
 
         // top
-        if ($myNode->getRow() > 0) {
-            $adjacentNodes[]= new MyNode($myNode->getRow() - 1, $myNode->getColumn());
+        if ($node->getRow() > 0) {
+            $adjacentNodes[]= new MyNode($node->getRow() - 1, $node->getColumn());
         }
         // bottom
-        if ($myNode->getRow() < $this->terrainCost->getTotalRows() - 1) {
-            $adjacentNodes[]= new MyNode($myNode->getRow() + 1, $myNode->getColumn());
+        if ($node->getRow() < $this->terrainCost->getTotalRows() - 1) {
+            $adjacentNodes[]= new MyNode($node->getRow() + 1, $node->getColumn());
         }
         // left
-        if ($myNode->getColumn() > 0) {
-            $adjacentNodes[]= new MyNode($myNode->getRow(), $myNode->getColumn() - 1);
+        if ($node->getColumn() > 0) {
+            $adjacentNodes[]= new MyNode($node->getRow(), $node->getColumn() - 1);
         }
         // right
-        if ($myNode->getColumn() < $this->terrainCost->getTotalColumns() - 1) {
-            $adjacentNodes[]= new MyNode($myNode->getRow(), $myNode->getColumn() + 1);
+        if ($node->getColumn() < $this->terrainCost->getTotalColumns() - 1) {
+            $adjacentNodes[]= new MyNode($node->getRow(), $node->getColumn() + 1);
         }
 
         return $adjacentNodes;
