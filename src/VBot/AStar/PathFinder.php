@@ -14,14 +14,22 @@ use JMGQ\AStar\Algorithm;
  */
 class PathFinder
 {
-    private $openList;
-    private $closedList;
-    private $terrainCost;
+    /** @var Node[] */
+    protected $openList;
 
+    /** @var Node[] */
+    protected $closedList;
+
+    /** @var TerrainCost */
+    protected $terrainCost;
+
+    /**
+     * @param TerrainCost $terrainCost
+     */
     public function __construct(TerrainCost $terrainCost)
     {
-        $this->openList = new NodeList();
-        $this->closedList = new NodeList();
+        $this->openList = [];
+        $this->closedList = [];
         $this->terrainCost = $terrainCost;
     }
 
@@ -82,28 +90,12 @@ class PathFinder
     }
 
     /**
-     * @return NodeList
-     */
-    public function getOpenList()
-    {
-        return $this->openList;
-    }
-
-    /**
-     * @return NodeList
-     */
-    public function getClosedList()
-    {
-        return $this->closedList;
-    }
-
-    /**
      * Sets the algorithm to its initial state
      */
     public function clear()
     {
-        $this->getOpenList()->clear();
-        $this->getClosedList()->clear();
+        $this->openList = [];
+        $this->closedList = [];
     }
 
     /**
@@ -120,12 +112,21 @@ class PathFinder
         $start->setG(0);
         $start->setH($this->calculateEstimatedCost($start, $goal));
 
-        $this->getOpenList()->add($start);
+        $this->openList[$start->getID()] = $start;
 
-        while (!$this->getOpenList()->isEmpty()) {
-            $currentNode = $this->getOpenList()->extractBest();
+        while (!empty($this->openList)) {
 
-            $this->getClosedList()->add($currentNode);
+            $currentNode = null;
+            foreach ($this->openList as $node) {
+                if ($currentNode === null || $node->getF() < $currentNode->getF()) {
+                    $currentNode = $node;
+                }
+            }
+            if ($currentNode !== null) {
+                unset($this->openList[$currentNode->getID()]);
+            }
+
+            $this->closedList[$currentNode->getID()] = $currentNode;
 
             if ($currentNode->getID() === $goal->getID()) {
                 $path = $this->generatePathFromStartNodeTo($currentNode);
@@ -135,25 +136,25 @@ class PathFinder
             $successors = $this->computeAdjacentNodes($currentNode, $goal);
 
             foreach ($successors as $successor) {
-                if ($this->getOpenList()->contains($successor)) {
-                    $successorInOpenList = $this->getOpenList()->get($successor);
+                if (isset($this->openList[$successor->getID()])) {
+                    $successorInOpenList = $this->openList[$successor->getID()];
 
                     if ($successor->getG() >= $successorInOpenList->getG()) {
                         continue;
                     }
                 }
 
-                if ($this->getClosedList()->contains($successor)) {
-                    $successorInClosedList = $this->getClosedList()->get($successor);
+                if (isset($this->closedList[$successor->getID()])) {
+                    $successorInClosedList = $this->closedList[$successor->getID()];
 
                     if ($successor->getG() >= $successorInClosedList->getG()) {
                         continue;
                     }
                 }
 
-                $this->getClosedList()->remove($successor);
+                unset($this->closedList[$successor->getID()]);
 
-                $this->getOpenList()->add($successor);
+                $this->openList[$successor->getID()]= $successor;
             }
         }
 
