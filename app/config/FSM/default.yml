@@ -39,7 +39,7 @@ transitions:
         from:
             - goto-tavern
         to: goto-enemy
-        condition: 'hero.getLife() > 85'
+        condition: 'hero.getLife() == 99'
     dying:
         from:
             - stay
