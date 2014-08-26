@@ -10,6 +10,8 @@ use Finite\State\State;
 use Finite\State\StateInterface;
 use Finite\StateMachine\StateMachine;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Yaml\Parser;
 
 /**
  * Decision engine
@@ -19,7 +21,10 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 class DecisionEngine implements DecisionEngineInterface, StatefulInterface
 {
     /** @var boolean */
-    const DEBUG = false;
+    const DEBUG = true;
+
+    /** @var array */
+    protected $options;
 
     /** @var Game */
     protected $game;
@@ -29,6 +34,16 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
 
     /** @var StateMachine $stateMachine */
     protected $stateMachine = null;
+
+    /**
+     * @param array $options
+     */
+    public function __construct($options)
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setRequired(['fsm_path']);
+        $this->options = $resolver->resolve($options);
+    }
 
     /**
      * {@inheritDoc}
@@ -85,66 +100,11 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
             return false;
         }
 
-        $this->stateMachine = new StateMachine($this);
-        $data = [
-            //'class' => 'FSMBot',
-            'states' => [
-                'stay' => [
-                    'type' => StateInterface::TYPE_INITIAL,
-                    'properties' => []
-                ],
-                'goto-mine' => [
-                    'type' => StateInterface::TYPE_NORMAL,
-                    'properties' => [
-                        'target' => 'game.getClosestNotOwnedMine(hero)'
-                    ]
-                ],
-                'goto-enemy' => [
-                    'type' => StateInterface::TYPE_NORMAL,
-                    'properties' => [
-                        'target' => 'game.getEnemyWithMoreMines()'
-                    ]
-                ],
-                'goto-tavern' => [
-                    'type' => StateInterface::TYPE_NORMAL,
-                    'properties' => [
-                        'target' => 'game.getClosestTavern(hero)'
-                    ]
-                ],
-                'dead' => [
-                    'type' => StateInterface::TYPE_FINAL,
-                    'properties' => []
-                ]
-            ],
-            'transitions' => [
-                'waiting' => [
-                    'from' => ['stay'],
-                    'to' => 'goto-mine',
-                    'condition' => 'true',
-                ],
-                'defend-mine' => [
-                    'from' => ['goto-mine'],
-                    'to' => 'goto-enemy',
-                    'condition' => 'hero.getMineCount() > 1',
-                ],
-                'hurted' => [
-                    'from' => ['stay', 'goto-enemy', 'goto-mine'],
-                    'to' => 'goto-tavern',
-                    'condition' => 'hero.getLife() < 50 && hero.getGold() >= 2',
-                ],
-                'healed' => [
-                    'from' => ['goto-tavern'],
-                    'to' => 'goto-enemy',
-                    'condition' => 'hero.getLife() > 85',
-                ],
-                'dying' => [
-                    'from' => ['stay', 'goto-mine', 'goto-tavern', 'goto-enemy'],
-                    'to' => 'dead',
-                    'condition' => 'hero.isCrashed()',
-                ]
-            ]
-        ];
+        $yaml = new Parser();
+        $data = $yaml->parse(file_get_contents($this->options['fsm_path']));
         $loader = new ExpressionLoader($data);
+
+        $this->stateMachine = new StateMachine($this);
         $loader->load($this->stateMachine);
         $this->stateMachine->setObject($this);
         $this->stateMachine->initialize();

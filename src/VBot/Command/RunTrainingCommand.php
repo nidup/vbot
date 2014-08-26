@@ -38,7 +38,10 @@ class RunTrainingCommand extends Command
         $output->writeln('');
 
         $botFactory = new BotFactory();
-        $bot = $botFactory->createBot();
+        $options = [
+            'decision' => ['fsm_path' => realpath('./app/config/FSM/default.yml')]
+        ];
+        $bot = $botFactory->createBot($options);
 
         $client = new Client(
             $bot,

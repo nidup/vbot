@@ -2,6 +2,8 @@
 
 namespace VBot\Bot;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 /**
  * Bot Factory
  *
@@ -10,14 +12,17 @@ namespace VBot\Bot;
 class BotFactory
 {
     /**
-     * @param string $type
-     * @param array  $options
+     * @param array $options the bot config
      *
      * @return BotInterface
      */
-    public function createBot($type = 'default', $options = [])
+    public function createBot($options = [])
     {
-        $decisionEngine = new Decision\DecisionEngine();
+        $resolver = new OptionsResolver();
+        $resolver->setRequired(['decision']);
+        $options = $resolver->resolve($options);
+
+        $decisionEngine = new Decision\DecisionEngine($options['decision']);
         $moveEngine = new Move\MoveEngine();
         $bot = new FSMBot($decisionEngine, $moveEngine);
 
