@@ -6,9 +6,13 @@ use JMGQ\AStar\Node;
 use JMGQ\AStar\NodeList;
 use JMGQ\AStar\Algorithm;
 
-// Quick attempt from git@github.com:jmgq/php-a-star.git
-// Not use callback algorithm due to extensible use of call user func
-class MyAlgorithm
+/**
+ * Path finder, inspirate from git@github.com:jmgq/php-a-star.git
+ * We don't use this library due to performance issues on big graphes
+ *
+ * @author Nicolas Dupont <nicolas@akeneo.com>
+ */
+class PathFinder
 {
     private $openList;
     private $closedList;
