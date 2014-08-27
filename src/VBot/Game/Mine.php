@@ -15,10 +15,15 @@ class Mine implements DestinationInterface
     /** @var integer */
     protected $ownerId;
 
+    /** @var boolean */
+    protected $newOwner = false;
+
     /** @var string */
     const NEUTRAL = '-';
 
     /**
+     * Create a mine
+     *
      * @param integer $x
      * @param integer $y
      * @param string  $ownerId
@@ -27,6 +32,19 @@ class Mine implements DestinationInterface
     {
         $this->position = new Position(['x' => $x, 'y' => $y]);
         $this->ownerId = ($ownerId === self::NEUTRAL) ? null : (int) $ownerId;
+    }
+
+    /**
+     * Update the mine state
+     *
+     * @param string $ownerId
+     */
+    public function update($ownerId)
+    {
+        $ownerId = ($ownerId === self::NEUTRAL) ? null : (int) $ownerId;
+        // TODO store all owners during turns
+        $this->newOwner = ($this->ownerId !== $ownerId);
+        $this->ownerId = $ownerId;
     }
 
     /**
@@ -51,6 +69,14 @@ class Mine implements DestinationInterface
     public function getOwnerId()
     {
         return $this->ownerId;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasNewOwner()
+    {
+        return $this->newOwner;
     }
 
     /**

@@ -57,6 +57,22 @@ abstract class AbstractPlayer implements DestinationInterface
     }
 
     /**
+     * Update the player state, update only what may change
+     *
+     * TODO : store all previous states for some data, for instance, nb dies, etc
+     *
+     * @param array $gameData
+     */
+    public function update($data)
+    {
+        $this->life = $data['life'];
+        $this->gold = $data['gold'];
+        $this->mineCount = $data['mineCount'];
+        $this->crashed = $data['crashed'];
+        $this->position = new Position($data['pos']);
+    }
+
+    /**
      * @return integer
      */
     public function getId()

@@ -46,6 +46,7 @@ class Client
 
         // Get the initial state
         $state = $this->getNewGameState();
+        $game = new Game($state);
         echo "Playing at: " . $state['viewUrl'] . "\n";
 
         ob_start();
@@ -53,12 +54,11 @@ class Client
             // Some nice output ;)
             echo '.';
             ob_flush();
-
             // Move to some direction
             $url = $state['playUrl'];
-            $game = new Game($state);
             $direction = $botObject->move($game);
             $state = $this->move($url, $direction);
+            $game->update($state);
         }
         ob_end_clean();
     }

@@ -37,13 +37,29 @@ class Board
     const IMPASSABLE_WOOD = '##';
 
     /**
+     * Initialize the board state and setup all models
+     *
      * @param array $boardData
      */
     public function __construct(array $boardData)
     {
         $this->size = (int) $boardData['size'];
         $this->tiles = $boardData['tiles'];
-        $this->parseTiles();
+        $this->createTaverns();
+        $this->createMines();
+        $this->updateTerrainCost();
+    }
+
+    /**
+     * Update the board state, update only what may change
+     *
+     * @param array $boardData
+     */
+    public function update($boardData)
+    {
+        $this->tiles = $boardData['tiles'];
+        $this->updateMines();
+        $this->updateTerrainCost();
     }
 
     /**
@@ -125,15 +141,69 @@ class Board
     }
 
     /**
-     * Parse the tiles to detect mines and taverns
+     * Parse the tiles to create taverns
+     */
+    protected function createTaverns()
+    {
+        $this->taverns = [];
+        $tiles = str_split($this->tiles, 2);
+        $indX = 0;
+        $indY = 0;
+        foreach ($tiles as $tile) {
+            if ($tile === self::TAVERN) {
+                $this->taverns[]= new Tavern($indX, $indY);
+            }
+            if (++$indY % $this->size === 0) {
+                $indX++;
+                $indY = 0;
+            }
+        }
+    }
+
+    /**
+     * Create mines
+     */
+    protected function createMines()
+    {
+        $this->mines = [];
+        $tiles = str_split($this->tiles, 2);
+        $indX = 0;
+        $indY = 0;
+        foreach ($tiles as $tile) {
+            if (strpos($tile, '$') !== false) {
+                $this->mines[]= new Mine($indX, $indY, $tile[1]);
+            }
+            if (++$indY % $this->size === 0) {
+                $indX++;
+                $indY = 0;
+            }
+        }
+    }
+
+    /**
+     * Update mines
+     */
+    protected function updateMines()
+    {
+        $tiles = str_split($this->tiles, 2);
+        $indMine = 0;
+        foreach ($tiles as $tile) {
+            if (strpos($tile, '$') !== false) {
+                $mine = $this->mines[$indMine];
+                $mine->update($tile[1]);
+                $indMine++;
+            }
+        }
+    }
+
+    /**
+     * Update terrain cost
      *
      * TODO : different terrain costs as shortest, safest
      * TODO : cost depends on map size and configuration
      */
-    protected function parseTiles()
+    protected function updateTerrainCost()
     {
-        $this->taverns = [];
-        $this->mines = [];
         $tiles = str_split($this->tiles, 2);
         $indX = 0;
         $indY = 0;
@@ -144,10 +214,8 @@ class Board
                 $rowCost[]= PHP_INT_MAX;
             } elseif ($tile === self::TAVERN) {
                 $rowCost[]= 50;
-                $this->taverns[]= new Tavern($indX, $indY);
             } elseif (strpos($tile, '$') !== false) {
                 $rowCost[]= 50;
-                $this->mines[]= new Mine($indX, $indY, $tile[1]);
             } elseif (strpos($tile, '@') !== false) {
                 $rowCost[]= 10;
             } else {

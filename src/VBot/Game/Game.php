@@ -40,6 +40,8 @@ class Game
     protected $playUrl;
 
     /**
+     * Initialize the game state and setup all models
+     *
      * @param array $gameData
      */
     public function __construct(array $gameData)
@@ -47,6 +49,7 @@ class Game
         $this->id = $gameData['game']['id'];
         $this->turn = $gameData['game']['turn'];
         $this->maxTurns = $gameData['game']['maxTurns'];
+        $this->finished = $gameData['game']['finished'];
         $this->enemies = [];
         foreach ($gameData['game']['heroes'] as $playerData) {
             if ($playerData['id'] !== $gameData['hero']['id']) {
@@ -54,11 +57,37 @@ class Game
             }
         }
         $this->board = new Board($gameData['game']['board']);
-        $this->finished = $gameData['game']['finished'];
         $this->hero = new Hero($gameData['hero']);
         $this->token = $gameData['token'];
         $this->viewUrl = $gameData['viewUrl'];
         $this->playUrl = $gameData['playUrl'];
+    }
+
+    /**
+     * Update the game state, update only what may change
+     *
+     * TODO : store all previous states for some data as mines to detect the competition on this one
+     *
+     * @param array $gameData
+     */
+    public function update($gameData)
+    {
+        // update game
+        $this->turn = $gameData['game']['turn'];
+        $this->finished = $gameData['game']['finished'];
+        // update enemies
+        $indEnemy = 0;
+        foreach ($gameData['game']['heroes'] as $playerData) {
+            if ($playerData['id'] !== $gameData['hero']['id']) {
+                $enemy = $this->enemies[$indEnemy];
+                $enemy->update($playerData);
+                $indEnemy++;
+            }
+        }
+        // update hero
+        $this->hero->update($gameData['hero']);
+        // update board
+        $this->board->update($gameData['game']['board']);
     }
 
     /**
