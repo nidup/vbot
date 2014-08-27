@@ -149,7 +149,7 @@ class Board
                 $rowCost[]= 50;
                 $this->mines[]= new Mine($indX, $indY, $tile[1]);
             } elseif (strpos($tile, '@') !== false) {
-                $rowCost[]= 5;
+                $rowCost[]= 10;
             } else {
                 $rowCost[]= 1;
             }

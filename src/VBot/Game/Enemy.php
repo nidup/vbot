@@ -3,10 +3,10 @@
 namespace VBot\Game;
 
 /**
- * Hero model
+ * Enemy model
  *
  * @author Nicolas Dupont <nicolas@akeneo.com>
  */
-class Hero extends AbstractPlayer
+class Enemy extends AbstractPlayer
 {
 }

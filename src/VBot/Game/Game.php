@@ -18,8 +18,8 @@ class Game
     /** @var integer */
     protected $maxTurns;
 
-    /** @var Hero[] */
-    protected $heroes;
+    /** @var Enemy[] */
+    protected $enemies;
 
     /** @var Board */
     protected $board;
@@ -39,9 +39,6 @@ class Game
     /** @var string */
     protected $playUrl;
 
-    /** @var Hero[] */
-    protected $enemies = null;
-
     /**
      * @param array $gameData
      */
@@ -50,9 +47,11 @@ class Game
         $this->id = $gameData['game']['id'];
         $this->turn = $gameData['game']['turn'];
         $this->maxTurns = $gameData['game']['maxTurns'];
-        $this->heroes = [];
-        foreach ($gameData['game']['heroes'] as $heroData) {
-            $this->heroes[]= new Hero($heroData);
+        $this->enemies = [];
+        foreach ($gameData['game']['heroes'] as $playerData) {
+            if ($playerData['id'] !== $gameData['hero']['id']) {
+                $this->enemies[]= new Enemy($playerData);
+            }
         }
         $this->board = new Board($gameData['game']['board']);
         $this->finished = $gameData['game']['finished'];
@@ -71,26 +70,10 @@ class Game
     }
 
     /**
-     * @return Hero[]
-     */
-    public function getHeroes()
-    {
-        return $this->heroes;
-    }
-
-    /**
-     * @return Hero[]
+     * @return Enemy[]
      */
     public function getEnemies()
     {
-        if ($this->enemies === null) {
-            foreach ($this->heroes as $hero) {
-                if ($hero->getId() !== $this->hero->getId()) {
-                    $this->enemies[]= $hero;
-                }
-            }
-        }
-
         return $this->enemies;
     }
 
