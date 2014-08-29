@@ -1,12 +1,5 @@
 states:
-    # start
-    # attack-leader
-    # attack-weaker
-    # hold-position
-    # conquest-mine
-    # goto-tavern
-    # re-spawn
-    stay:
+    start:
         type: initial
     goto-mine:
         type: normal
@@ -14,48 +7,66 @@ states:
         type: normal
     goto-tavern:
         type: normal
+    hold-position:
+        type: normal
     dead:
         type: final
 transitions:
     waiting:
         from:
-            - stay
+            - start
         to: goto-mine
         condition: 'true'
         action:    'hero.setTarget(game.getClosestNotOwnedMine(hero))'
-    capture-mine-and-goto-other:
+    capture-mine-then-goto-other-mine:
         from:
              - goto-mine
         to: goto-mine
-        condition: 'hero.getTarget().isOwnedBy(hero)'
-        # TODO : if target === null ?
+        condition: 'hero.getTarget().isOwnedBy(hero) && game.ownsAllMines(hero) === false'
         action:    'hero.setTarget(game.getClosestNotOwnedMine(hero))'
-    attack:
+    capture-last-mine-then-hold-position:
+        from:
+             - goto-mine
+        to: hold-position
+        condition: 'game.ownsAllMines(hero)'
+        action:    'hero.resetTarget()'
+#    attack:
+#        from:
+#            - goto-mine
+#        to: goto-enemy
+#        condition: 'hero.getMineCount() > 2'
+#        action:    'hero.setTarget(game.getEnemyWithMoreMines())'
+    hurted-two-attacks:
         from:
             - goto-mine
-        to: goto-enemy
-        condition: 'hero.getMineCount() > 2'
-        action:    'hero.setTarget(game.getEnemyWithMoreMines())'
-    hurted:
-        from:
-            - stay
             - goto-enemy
-            - goto-mine
         to: goto-tavern
-        condition: 'hero.getLife() < 50 && hero.getGold() >= 2'
+        condition: 'hero.getLife() < 41 && hero.getGold() >= 2'
         action:    'hero.setTarget(game.getClosestTavern(hero))'
-    healed:
+    hurted-defensive:
+        from:
+            - hold-position
+        to: goto-tavern
+        condition: 'hero.getLife() < 80 && hero.getGold() >= 2'
+        action:    'hero.setTarget(game.getClosestTavern(hero))'
+    healed-then-goto-mine:
         from:
             - goto-tavern
         to: goto-mine
-        condition: 'hero.getLife() == 99'
+        condition: 'hero.getLife() == 99 && game.ownsAllMines(hero) === false'
         action:    'hero.setTarget(game.getClosestNotOwnedMine(hero))'
-    dying:
+    healed-then-hold-position:
         from:
-            - stay
-            - goto-mine
             - goto-tavern
-            - goto-enemy
-        to: dead
-        condition: 'hero.isCrashed()'
-        action:    ~
+        to: hold-position
+        condition: 'hero.getLife() == 99 && game.ownsAllMines(hero)'
+        action:    'hero.resetTarget()'
+
+#    dying:
+#        from:
+#            - goto-mine
+#            - goto-tavern
+#            - goto-enemy
+#        to: dead
+#        condition: 'hero.isCrashed()'
+#        action:    ~

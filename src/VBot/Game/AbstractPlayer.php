@@ -39,6 +39,9 @@ abstract class AbstractPlayer implements DestinationInterface
     /** @var Position */
     protected $spawnPosition;
 
+    /** @var Mine[] */
+    protected $ownedMines;
+
     /**
      * @param array $data
      */
@@ -54,6 +57,7 @@ abstract class AbstractPlayer implements DestinationInterface
         $this->crashed = $data['crashed'];
         $this->position = new Position($data['pos']);
         $this->spawnPosition = new Position($data['spawnPos']);
+        $this->ownedMines = [];
     }
 
     /**
@@ -61,15 +65,23 @@ abstract class AbstractPlayer implements DestinationInterface
      *
      * TODO : store all previous states for some data, for instance, nb dies, etc
      *
-     * @param array $gameData
+     * @param array $data
+     * @param array $mines
      */
-    public function update($data)
+    public function update(array $data, array $mines)
     {
         $this->life = $data['life'];
         $this->gold = $data['gold'];
         $this->mineCount = $data['mineCount'];
         $this->crashed = $data['crashed'];
         $this->position = new Position($data['pos']);
+        $ownedMines = [];
+        foreach ($mines as $mine) {
+            if ($mine->isOwnedBy($this)) {
+                $ownedMines[]= $mine;
+            }
+        }
+        $this->ownedMines = $ownedMines;
     }
 
     /**
@@ -158,5 +170,13 @@ abstract class AbstractPlayer implements DestinationInterface
     public function isCrashed()
     {
         return $this->crashed;
+    }
+
+    /*
+     * @return Mine[]
+     */
+    public function getOwnedMines()
+    {
+        return $this->ownedMines;
     }
 }

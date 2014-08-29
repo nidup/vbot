@@ -100,7 +100,7 @@ class ExpressionLoader implements LoaderInterface
                     $object = $event->getStateMachine()->getObject();
                     $game = $object->getGame();
                     $hero = $game->getHero();
-                    if ($language->evaluate($config['condition'], ['hero' => $hero]) === false) {
+                    if ($language->evaluate($config['condition'], ['hero' => $hero, 'game' => $game]) === false) {
                         $event->reject();
                     }
                 }

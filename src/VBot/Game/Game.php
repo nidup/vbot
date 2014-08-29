@@ -18,17 +18,20 @@ class Game
     /** @var integer */
     protected $maxTurns;
 
+    /** @var AbstractPlayer[] */
+    protected $players;
+
     /** @var Enemy[] */
     protected $enemies;
+
+    /** @var Hero */
+    protected $hero;
 
     /** @var Board */
     protected $board;
 
     /** @var boolean */
     protected $finished;
-
-    /** @var Hero */
-    protected $hero;
 
     /** @var Ranking */
     protected $ranking;
@@ -61,8 +64,8 @@ class Game
         }
         $this->board = new Board($gameData['game']['board']);
         $this->hero = new Hero($gameData['hero']);
-        $players = array_merge($this->enemies, [$this->hero]);
-        $this->ranking = new Ranking($players);
+        $this->players = array_merge($this->enemies, [$this->hero]);
+        $this->ranking = new Ranking($this->players);
         $this->token = $gameData['token'];
         $this->viewUrl = $gameData['viewUrl'];
         $this->playUrl = $gameData['playUrl'];
@@ -80,19 +83,19 @@ class Game
         // update game
         $this->turn = $gameData['game']['turn'];
         $this->finished = $gameData['game']['finished'];
+        // update board
+        $this->board->update($gameData['game']['board']);
         // update enemies
         $indEnemy = 0;
         foreach ($gameData['game']['heroes'] as $playerData) {
             if ($playerData['id'] !== $gameData['hero']['id']) {
                 $enemy = $this->enemies[$indEnemy];
-                $enemy->update($playerData);
+                $enemy->update($playerData, $this->board->getMines());
                 $indEnemy++;
             }
         }
         // update hero
-        $this->hero->update($gameData['hero']);
-        // update board
-        $this->board->update($gameData['game']['board']);
+        $this->hero->update($gameData['hero'], $this->board->getMines());
     }
 
     /**
@@ -234,5 +237,15 @@ class Game
         }
 
         return $target;
+    }
+
+    /**
+     * @param AbstractPlayer $player
+     *
+     * @return boolean
+     */
+    public function ownsAllMines(AbstractPlayer $player)
+    {
+        return count($player->getOwnedMines()) == count($this->getMines());
     }
 }
