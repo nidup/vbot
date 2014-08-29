@@ -58,8 +58,14 @@ class Client
             $url = $state['playUrl'];
             $direction = $botObject->move($game);
             $state = $this->move($url, $direction);
-            $game->update($state);
+            // potential timeout
+            if ($this->isFinished($state) === false) {
+                $game->update($state);
+            }
         }
+        $game->finish($state);
+
+        ob_flush();
         ob_end_clean();
     }
 
@@ -92,20 +98,23 @@ class Client
          * Send a move to the server
          * Moves can be one of: 'Stay', 'North', 'South', 'East', 'West'
          */
-
         try {
             $r = HttpPost::post($url, array('dir' => $direction), self::TIMEOUT);
             if (isset($r['headers']['status_code']) && $r['headers']['status_code'] == 200) {
                 return json_decode($r['content'], true);
+
             } else {
                 echo "Error HTTP " . $r['headers']['status_code'] . "\n" . $r['content'] . "\n";
+                $code = $r['headers']['status_code'];
+                $content = $r['content'];
 
-                return array('game' => array('finished' => true));
+                return array('game' => array('finished' => true), 'error' => ['code' => $code, 'content' => $content]);
             }
         } catch (\Exception $e) {
             echo $e->getMessage() . "\n";
 
-            return array('game' => array('finished' => true));
+            return array('game' => array('finished' => true), 'error' => ['code' => 'exception', 'content' => $e->getMessage()]);
+
         }
     }
 

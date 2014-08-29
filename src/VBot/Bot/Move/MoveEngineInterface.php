@@ -2,7 +2,7 @@
 
 namespace VBot\Bot\Move;
 
-use VBot\Game\DestinationInterface;
+use VBot\Game\Hero;
 use VBot\Game\Board;
 
 /**
@@ -13,11 +13,10 @@ use VBot\Game\Board;
 interface MoveEngineInterface
 {
     /**
-     * @param Board                $board
-     * @param DestinationInterface $start
-     * @param DestinationInterface $target
+     * @param Board $board
+     * @param Hero  $hero
      *
      * @return $direction
      */
-    public function move(Board $board, DestinationInterface $start, DestinationInterface $target);
+    public function process(Board $board, Hero $hero);
 }

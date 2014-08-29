@@ -81,6 +81,14 @@ abstract class AbstractPlayer implements DestinationInterface
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
      * @return Position
      */
     public function getPosition()

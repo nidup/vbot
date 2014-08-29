@@ -2,7 +2,7 @@
 
 namespace VBot\Bot\Move;
 
-use VBot\Game\DestinationInterface;
+use VBot\Game\Hero;
 use VBot\Game\Board;
 
 /**
@@ -15,15 +15,19 @@ class MoveEngine implements MoveEngineInterface
     /**
      * {@inheritDoc}
      */
-    public function move(Board $board, DestinationInterface $start, DestinationInterface $target)
+    public function process(Board $board, Hero $hero)
     {
-        $path = $board->getShortestPath($start, $target);
+        if ($hero->getTarget() === null) {
+            return 'Stay';
+        }
+
+        $path = $board->getShortestPath($hero, $hero->getTarget());
         if (!isset($path[1])) {
             return 'Stay';
         }
 
-        $myPosX = $start->getPosX();
-        $myPosY = $start->getPosY();
+        $myPosX = $hero->getPosX();
+        $myPosY = $hero->getPosY();
 
         $firstNode = $path[1];
         $destX = (int) $firstNode->getRow();

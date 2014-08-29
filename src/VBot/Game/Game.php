@@ -30,6 +30,9 @@ class Game
     /** @var Hero */
     protected $hero;
 
+    /** @var Ranking */
+    protected $ranking;
+
     /** @var string */
     protected $token;
 
@@ -58,6 +61,8 @@ class Game
         }
         $this->board = new Board($gameData['game']['board']);
         $this->hero = new Hero($gameData['hero']);
+        $players = array_merge($this->enemies, [$this->hero]);
+        $this->ranking = new Ranking($players);
         $this->token = $gameData['token'];
         $this->viewUrl = $gameData['viewUrl'];
         $this->playUrl = $gameData['playUrl'];
@@ -91,6 +96,33 @@ class Game
     }
 
     /**
+     * Finish the game, can be normal end of timeout issue
+     *
+     * @param array $gameData
+     */
+    public function finish($gameData)
+    {
+        if (isset($gameData['error'])) {
+            echo sprintf('GAME HAS BEEN ABORTED %d/%d', $this->turn, $this->maxTurns).PHP_EOL;
+            echo 'ERROR: '.$gameData['error']['content'].PHP_EOL;
+        } else {
+            echo sprintf('GAME IS FINISHED %d/%d', $this->turn, $this->maxTurns).PHP_EOL;
+            echo 'RANKING'.PHP_EOL;
+            $players = $this->ranking->byGoldAmount();
+            $position = 1;
+            foreach ($players as $player) {
+                echo sprintf(
+                    '%d : %s (%d) with %d gold',
+                    $position++,
+                    $player->getName(),
+                    $player->getId(),
+                    $player->getGold()
+                ).PHP_EOL;
+            }
+        }
+    }
+
+    /**
      * @return Hero
      */
     public function getHero()
@@ -115,11 +147,27 @@ class Game
     }
 
     /**
+     * @return Ranking
+     */
+    public function getRanking()
+    {
+        return $this->ranking;
+    }
+
+    /**
      * @return integer
      */
     public function getTurn()
     {
         return $this->turn;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getMaxTurns()
+    {
+        return $this->maxTurns;
     }
 
     /**

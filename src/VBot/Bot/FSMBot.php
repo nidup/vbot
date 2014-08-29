@@ -13,6 +13,9 @@ use VBot\Bot\Decision\DecisionEngineInterface;
  */
 class FSMBot implements BotInterface
 {
+    /** @var boolean */
+    const DEBUG = true;
+
     /** @var DecisionEngineInterface */
     protected $decisionEngine;
 
@@ -34,11 +37,28 @@ class FSMBot implements BotInterface
      */
     public function move(Game $game)
     {
-        $target = $this->decisionEngine->decide($game);
-        if ($target === null) {
-            $destination = 'Stay';
-        } else {
-            $destination = $this->moveEngine->move($game->getBoard(), $game->getHero(), $target);
+        if (self::DEBUG) {
+            $timeStart = microtime(true);
+            $hero = $game->getHero();
+            echo sprintf(
+                'Turn: %d/%d Life: %d Gold: %d Pos x:y : %d:%d',
+                $game->getTurn(),
+                $game->getMaxTurns(),
+                $hero->getLife(),
+                $hero->getGold(),
+                $hero->getPosX(),
+                $hero->getPosY()
+            ).PHP_EOL;
+        }
+
+        $this->decisionEngine->process($game);
+        $destination = $this->moveEngine->process($game->getBoard(), $game->getHero());
+
+        if (self::DEBUG) {
+            $timeEnd = microtime(true);
+            $time = $timeEnd - $timeStart;
+            $memory = memory_get_peak_usage() / 1024 / 1024;
+            echo sprintf('Time: %s sec, Memory: %s M', number_format($time, 2), number_format($memory, 2)).PHP_EOL;
         }
 
         return $destination;

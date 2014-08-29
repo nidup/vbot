@@ -3,11 +3,9 @@
 namespace VBot\Bot\Decision;
 
 use VBot\Game\Game;
-use VBot\Game\DestinationInterface;
 use VBot\Finite\Loader\ExpressionLoader;
 use Finite\StatefulInterface;
 use Finite\State\State;
-use Finite\State\StateInterface;
 use Finite\StateMachine\StateMachine;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Yaml\Parser;
@@ -19,9 +17,6 @@ use Symfony\Component\Yaml\Parser;
  */
 class DecisionEngine implements DecisionEngineInterface, StatefulInterface
 {
-    /** @var boolean */
-    const DEBUG = true;
-
     /** @var array */
     protected $options;
 
@@ -47,18 +42,15 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
     /**
      * {@inheritDoc}
      */
-    public function decide(Game $game)
+    public function process(Game $game)
     {
-        // TODO no need to update
-        $this->updateGame($game);
-        $this->loadStateMachine();
-        $target = $this->compute();
-
-        return $target;
+        $this->initializeGame($game);
+        $this->initializeStateMachine();
+        $this->compute();
     }
 
     /**
-     * @param string $state
+     * {@inheritDoc}
      */
     public function setFiniteState($state)
     {
@@ -66,7 +58,7 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
     }
 
     /**
-     * @return StateInterface
+     * {@inheritDoc}
      */
     public function getFiniteState()
     {
@@ -82,11 +74,20 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
     }
 
     /**
+     * Initialize the game
+     *
      * @param Game $game
+     *
+     * @return boolean
      */
-    protected function updateGame(Game $game)
+    protected function initializeGame($game)
     {
+        if ($this->game !== null) {
+            return false;
+        }
         $this->game = $game;
+
+        return true;
     }
 
     /**
@@ -94,7 +95,7 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
      *
      * @return boolean
      */
-    protected function loadStateMachine()
+    protected function initializeStateMachine()
     {
         if ($this->stateMachine !== null) {
             return false;
@@ -113,29 +114,20 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
     }
 
     /**
-     * Compute transitions to retrieve the target
+     * Compute transitions to update the target
      *
-     * @return DestinationInterface|null
+     * @return boolean
      */
     protected function compute()
     {
-        if (self::DEBUG) {
-            $hero = $this->game->getHero();
-            echo 'Turn:'.$this->game->getTurn().' state:'.$this->state.' life:'.$hero->getLife().' gold:'.$hero->getGold().' Pos x:y'.$hero->getPosX().':'.$hero->getPosY().PHP_EOL;
-        }
-
         $transitions = $this->stateMachine->getCurrentState()->getTransitions();
         foreach ($transitions as $transition) {
             if ($this->stateMachine->can($transition)) {
-                if (self::DEBUG) {
-                    echo '>> apply '.$transition.PHP_EOL;
-                }
-                // apply updates the target
                 $this->stateMachine->apply($transition);
                 break;
             }
         }
 
-        return $this->game->getHero()->getTarget();
+        return true;
     }
 }
