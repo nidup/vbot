@@ -9,7 +9,6 @@ use Finite\StatefulInterface;
 use Finite\State\State;
 use Finite\State\StateInterface;
 use Finite\StateMachine\StateMachine;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Yaml\Parser;
 
@@ -50,6 +49,7 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
      */
     public function decide(Game $game)
     {
+        // TODO no need to update
         $this->updateGame($game);
         $this->loadStateMachine();
         $target = $this->compute();
@@ -121,7 +121,7 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
     {
         if (self::DEBUG) {
             $hero = $this->game->getHero();
-            echo 'Turn:'.$this->game->getTurn().' state:'.$this->state.' life:'.$hero->getLife().' gold:'.$hero->getGold().' Pos x:y'.$hero->getPosX().':'.$hero->getPosY();
+            echo 'Turn:'.$this->game->getTurn().' state:'.$this->state.' life:'.$hero->getLife().' gold:'.$hero->getGold().' Pos x:y'.$hero->getPosX().':'.$hero->getPosY().PHP_EOL;
         }
 
         $transitions = $this->stateMachine->getCurrentState()->getTransitions();
@@ -136,22 +136,6 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
             }
         }
 
-        $currentState = $this->stateMachine->getCurrentState();
-        if ($currentState->has('target')) {
-            $targetExpression = $currentState->get('target');
-            $language = new ExpressionLanguage();
-            $target = $language->evaluate(
-                $targetExpression,
-                ['game' => $this->game, 'hero' => $this->game->getHero()]
-            );
-
-            if (self::DEBUG && $target) {
-                echo ' Targ x:y'.$target->getPosX().':'.$target->getPosY().PHP_EOL;
-            }
-
-            return $target;
-        }
-
-        return null;
+        return $this->game->getHero()->getTarget();
     }
 }

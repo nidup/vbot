@@ -86,4 +86,14 @@ class Mine implements DestinationInterface
     {
         return $this->ownerId === null;
     }
+
+    /**
+     * @param AbstractPlayer $player
+     *
+     * @return boolean
+     */
+    public function isOwnedBy(AbstractPlayer $player)
+    {
+        return $this->ownerId === $player->getId();
+    }
 }

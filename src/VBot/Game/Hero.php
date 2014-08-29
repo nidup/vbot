@@ -9,4 +9,22 @@ namespace VBot\Game;
  */
 class Hero extends AbstractPlayer
 {
+    protected $target = null;
+
+    /**
+     * @return DestinationInterface $target
+     */
+    public function getTarget()
+    {
+        return $this->target;
+    }
+
+    /**
+     * @param DestinationInterface|null $target
+     */
+    public function setTarget(DestinationInterface $target)
+    {
+        echo 'CHANGE TARGET '.get_class($target).' x:y'.$target->getPosX().':'.$target->getPosY().PHP_EOL;
+        $this->target = $target;
+    }
 }

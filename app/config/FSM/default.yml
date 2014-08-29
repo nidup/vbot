@@ -1,33 +1,41 @@
 states:
+    # start
+    # attack-leader
+    # attack-weaker
+    # hold-position
+    # conquest-mine
+    # goto-tavern
+    # re-spawn
     stay:
         type: initial
-        properties: {  }
     goto-mine:
         type: normal
-        properties:
-            target: 'game.getClosestNotOwnedMine(hero)'
     goto-enemy:
         type: normal
-        properties:
-            target: 'game.getEnemyWithMoreMines()'
     goto-tavern:
         type: normal
-        properties:
-            target: 'game.getClosestTavern(hero)'
     dead:
         type: final
-        properties: {  }
 transitions:
     waiting:
         from:
             - stay
         to: goto-mine
         condition: 'true'
-    defend-mine:
+        action:    'hero.setTarget(game.getClosestNotOwnedMine(hero))'
+    capture-mine-and-goto-other:
+        from:
+             - goto-mine
+        to: goto-mine
+        condition: 'hero.getTarget().isOwnedBy(hero)'
+        # TODO : if target === null ?
+        action:    'hero.setTarget(game.getClosestNotOwnedMine(hero))'
+    attack:
         from:
             - goto-mine
         to: goto-enemy
-        condition: 'hero.getMineCount() > 1'
+        condition: 'hero.getMineCount() > 2'
+        action:    'hero.setTarget(game.getEnemyWithMoreMines())'
     hurted:
         from:
             - stay
@@ -35,11 +43,13 @@ transitions:
             - goto-mine
         to: goto-tavern
         condition: 'hero.getLife() < 50 && hero.getGold() >= 2'
+        action:    'hero.setTarget(game.getClosestTavern(hero))'
     healed:
         from:
             - goto-tavern
-        to: goto-enemy
+        to: goto-mine
         condition: 'hero.getLife() == 99'
+        action:    'hero.setTarget(game.getClosestNotOwnedMine(hero))'
     dying:
         from:
             - stay
@@ -48,3 +58,4 @@ transitions:
             - goto-enemy
         to: dead
         condition: 'hero.isCrashed()'
+        action:    ~

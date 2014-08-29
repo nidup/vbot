@@ -86,13 +86,14 @@ class ExpressionLoader implements LoaderInterface
     protected function loadTransitions(StateMachineInterface $stateMachine)
     {
         $resolver = new OptionsResolver();
-        $resolver->setRequired(['from', 'to', 'condition']);
+        $resolver->setRequired(['from', 'to', 'condition', 'action']);
         $resolver->setNormalizers(['from' => function (Options $options, $v) { return (array) $v; }]);
         $language = new ExpressionLanguage();
 
         foreach ($this->config['transitions'] as $transition => $config) {
             $config = $resolver->resolve($config);
             $stateMachine->addTransition(new Transition($transition, $config['from'], $config['to']));
+            // test transition with expression language
             $stateMachine->getDispatcher()->addListener(
                 'finite.test_transition.'.$transition,
                 function (TransitionEvent $event) use ($language, $config) {
@@ -104,6 +105,17 @@ class ExpressionLoader implements LoaderInterface
                     }
                 }
             );
+            // execute actions with expression language during transition appliance
+            $stateMachine->getDispatcher()->addListener(
+                'finite.post_transition.'.$transition,
+                function (TransitionEvent $event) use ($language, $config) {
+                    $object = $event->getStateMachine()->getObject();
+                    $game = $object->getGame();
+                    $hero = $game->getHero();
+                    $language->evaluate($config['action'], ['hero' => $hero, 'game' => $game]);
+                }
+            );
+
         }
     }
 }
