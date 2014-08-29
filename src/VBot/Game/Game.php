@@ -65,7 +65,7 @@ class Game
         $this->board = new Board($gameData['game']['board']);
         $this->hero = new Hero($gameData['hero']);
         $this->players = array_merge($this->enemies, [$this->hero]);
-        $this->ranking = new Ranking($this->players);
+        $this->ranking = new Ranking($this);
         $this->token = $gameData['token'];
         $this->viewUrl = $gameData['viewUrl'];
         $this->playUrl = $gameData['playUrl'];
@@ -139,6 +139,14 @@ class Game
     public function getEnemies()
     {
         return $this->enemies;
+    }
+
+    /**
+     * @return AbstractPlayer
+     */
+    public function getPlayers()
+    {
+        return $this->players;
     }
 
     /**

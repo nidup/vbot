@@ -59,7 +59,7 @@ class Client
             $direction = $botObject->move($game);
             $state = $this->move($url, $direction);
             // potential timeout
-            if ($this->isFinished($state) === false) {
+            if ($this->isAborted($state) === false) {
                 $game->update($state);
             }
         }
@@ -116,6 +116,11 @@ class Client
             return array('game' => array('finished' => true), 'error' => ['code' => 'exception', 'content' => $e->getMessage()]);
 
         }
+    }
+
+    private function isAborted($state)
+    {
+        return isset($state['error']);
     }
 
     private function isFinished($state)

@@ -41,14 +41,15 @@ class FSMBot implements BotInterface
             $timeStart = microtime(true);
             $hero = $game->getHero();
             echo sprintf(
-                'Turn: %d/%d Life: %d Gold: %d Pos x:y : %d:%d Leader: %s',
+                'Turn: %d/%d Life: %d Gold: %d Pos x:y : %d:%d Leader: %s Victory ratio: %d',
                 $game->getTurn(),
                 $game->getMaxTurns(),
                 $hero->getLife(),
                 $hero->getGold(),
                 $hero->getPosX(),
                 $hero->getPosY(),
-                ($game->getRanking()->isLeader($hero)) ? 'Yes' : 'No'
+                ($game->getRanking()->isLeader($hero)) ? 'Yes' : 'No',
+                $game->getRanking()->getVictoryRatio($hero)
             ).PHP_EOL;
         }
 
@@ -59,7 +60,7 @@ class FSMBot implements BotInterface
             $timeEnd = microtime(true);
             $time = $timeEnd - $timeStart;
             $memory = memory_get_peak_usage() / 1024 / 1024;
-            echo sprintf('Time: %s sec, Memory: %s M', number_format($time, 2), number_format($memory, 2)).PHP_EOL;
+            // echo sprintf('Time: %s sec, Memory: %s M', number_format($time, 2), number_format($memory, 2)).PHP_EOL;
         }
 
         return $destination;

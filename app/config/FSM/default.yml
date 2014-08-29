@@ -23,7 +23,7 @@ transitions:
         from:
              - goto-mine
         to: hold-position
-        condition: 'hero.getTarget().isOwnedBy(hero) && game.getRanking().isLeader(hero)'
+        condition: 'hero.getTarget().isOwnedBy(hero) && game.getRanking().getVictoryRatio(hero) >= 80'
         action:    'hero.resetTarget()'
     capture-mine-then-goto-other-mine:
         from:
@@ -55,7 +55,7 @@ transitions:
         from:
             - goto-tavern
         to: hold-position
-        condition: 'hero.getLife() == 99 && game.getRanking().isLeader(hero)'
+        condition: 'hero.getLife() == 99 && game.getRanking().getVictoryRatio(hero) >= 80'
         action:    'hero.resetTarget()'
     healed-then-goto-mine:
         from:
