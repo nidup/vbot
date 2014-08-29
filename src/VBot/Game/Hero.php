@@ -9,6 +9,7 @@ namespace VBot\Game;
  */
 class Hero extends AbstractPlayer
 {
+    /** @var DestinationInterface */
     protected $target = null;
 
     /**
@@ -29,7 +30,7 @@ class Hero extends AbstractPlayer
     }
 
     /**
-     * @param DestinationInterface|null $target
+     * Unset the target
      */
     public function resetTarget()
     {

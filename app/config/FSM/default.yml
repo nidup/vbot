@@ -18,18 +18,19 @@ transitions:
         to: goto-mine
         condition: 'true'
         action:    'hero.setTarget(game.getClosestNotOwnedMine(hero))'
+    # defensive position in priority
+    capture-a-last-mine-then-hold-position:
+        from:
+             - goto-mine
+        to: hold-position
+        condition: 'hero.getTarget().isOwnedBy(hero) && game.getRanking().isLeader(hero)'
+        action:    'hero.resetTarget()'
     capture-mine-then-goto-other-mine:
         from:
              - goto-mine
         to: goto-mine
         condition: 'hero.getTarget().isOwnedBy(hero) && game.ownsAllMines(hero) === false'
         action:    'hero.setTarget(game.getClosestNotOwnedMine(hero))'
-    capture-last-mine-then-hold-position:
-        from:
-             - goto-mine
-        to: hold-position
-        condition: 'game.ownsAllMines(hero)'
-        action:    'hero.resetTarget()'
 #    attack:
 #        from:
 #            - goto-mine
@@ -47,20 +48,21 @@ transitions:
         from:
             - hold-position
         to: goto-tavern
-        condition: 'hero.getLife() < 80 && hero.getGold() >= 2'
+        condition: 'hero.getLife() < 81 && hero.getGold() >= 2'
         action:    'hero.setTarget(game.getClosestTavern(hero))'
+    # defensive position in priority
+    healed-then-hold-position:
+        from:
+            - goto-tavern
+        to: hold-position
+        condition: 'hero.getLife() == 99 && game.getRanking().isLeader(hero)'
+        action:    'hero.resetTarget()'
     healed-then-goto-mine:
         from:
             - goto-tavern
         to: goto-mine
         condition: 'hero.getLife() == 99 && game.ownsAllMines(hero) === false'
         action:    'hero.setTarget(game.getClosestNotOwnedMine(hero))'
-    healed-then-hold-position:
-        from:
-            - goto-tavern
-        to: hold-position
-        condition: 'hero.getLife() == 99 && game.ownsAllMines(hero)'
-        action:    'hero.resetTarget()'
 
 #    dying:
 #        from:

@@ -41,13 +41,14 @@ class FSMBot implements BotInterface
             $timeStart = microtime(true);
             $hero = $game->getHero();
             echo sprintf(
-                'Turn: %d/%d Life: %d Gold: %d Pos x:y : %d:%d',
+                'Turn: %d/%d Life: %d Gold: %d Pos x:y : %d:%d Leader: %s',
                 $game->getTurn(),
                 $game->getMaxTurns(),
                 $hero->getLife(),
                 $hero->getGold(),
                 $hero->getPosX(),
-                $hero->getPosY()
+                $hero->getPosY(),
+                ($game->getRanking()->isLeader($hero)) ? 'Yes' : 'No'
             ).PHP_EOL;
         }
 

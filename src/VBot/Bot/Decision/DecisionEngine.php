@@ -123,6 +123,7 @@ class DecisionEngine implements DecisionEngineInterface, StatefulInterface
         $transitions = $this->stateMachine->getCurrentState()->getTransitions();
         foreach ($transitions as $transition) {
             if ($this->stateMachine->can($transition)) {
+                echo 'Apply '.$transition.PHP_EOL;
                 $this->stateMachine->apply($transition);
                 break;
             }
