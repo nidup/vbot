@@ -110,8 +110,14 @@ class Game
             echo 'ERROR: '.$gameData['error']['content'].PHP_EOL;
         } else {
             echo sprintf('GAME IS FINISHED %d/%d', $this->turn, $this->maxTurns).PHP_EOL;
-            echo 'RANKING'.PHP_EOL;
             $players = $this->ranking->byGoldAmount();
+            $winner = $players[0];
+            if ($winner === $this->hero) {
+                echo 'YOU WIN'.PHP_EOL;
+            } else {
+                echo 'YOU LOOSE'.PHP_EOL;
+            }
+            echo 'RANKING'.PHP_EOL;
             $position = 1;
             foreach ($players as $player) {
                 echo sprintf(

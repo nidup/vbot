@@ -1,8 +1,9 @@
 {
     "name": "nidup/vbot",
+    "type": "project",
     "description": "Vindinium Bot",
     "license": "MIT",
-    "keywords": ["AI"],
+    "keywords": ["AI", "FSM", "Path Finding"],
     "authors": [
         {
             "name": "Nicolas Dupont",
@@ -11,14 +12,21 @@
     ],
     "autoload": {
         "psr-0": {
-            "VBot\\": "./src/"
+            "VBot\\": "src/"
         }
     },
     "require": {
+        "php": ">=5.4.4",
         "symfony/console": "2.5.3",
         "symfony/yaml": "2.5.3",
         "symfony/expression-language": "2.5.3",
         "yohang/finite": "1.0.3"
+    },
+    "require-dev": {
+        "phpspec/phpspec": "dev-master@dev"
+    },
+    "config": {
+        "bin-dir": "bin"
     },
     "minimum-stability": "dev"
 }

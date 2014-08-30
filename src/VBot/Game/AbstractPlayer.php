@@ -50,7 +50,7 @@ abstract class AbstractPlayer implements DestinationInterface
         $this->id = $data['id'];
         $this->name = $data['name'];
         $this->userId = isset($data['userId']) ? $data['userId'] : '__TrainingBot';
-        $this->elo = isset($data['elo']) ? $data['elo'] : 0;
+        $this->elo = isset($data['elo']) ? $data['elo'] : 1200;
         $this->life = $data['life'];
         $this->gold = $data['gold'];
         $this->mineCount = $data['mineCount'];
