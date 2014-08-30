@@ -12,6 +12,9 @@ class Hero extends AbstractPlayer
     /** @var DestinationInterface */
     protected $target = null;
 
+    /** @var string */
+    protected $direction = 'Stay';
+
     /**
      * @return DestinationInterface $target
      */
@@ -36,5 +39,21 @@ class Hero extends AbstractPlayer
     {
         echo 'RESET TARGET'.PHP_EOL;
         $this->target = null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDirection()
+    {
+        return $this->direction;
+    }
+
+    /**
+     * @param string
+     */
+    public function setDirection($direction)
+    {
+        $this->direction = $direction;
     }
 }

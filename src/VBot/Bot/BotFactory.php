@@ -3,6 +3,8 @@
 namespace VBot\Bot;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use VBot\Bot\Engine\DecisionEngine;
+use VBot\Bot\Engine\MoveEngine;
 
 /**
  * Bot Factory
@@ -22,8 +24,8 @@ class BotFactory
         $resolver->setRequired(['decision']);
         $options = $resolver->resolve($options);
 
-        $decisionEngine = new Decision\DecisionEngine($options['decision']);
-        $moveEngine = new Move\MoveEngine();
+        $decisionEngine = new DecisionEngine($options['decision']);
+        $moveEngine = new MoveEngine();
         $bot = new FSMBot($decisionEngine, $moveEngine);
 
         return $bot;

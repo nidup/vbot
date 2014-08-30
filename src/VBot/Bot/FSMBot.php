@@ -2,9 +2,8 @@
 
 namespace VBot\Bot;
 
+use VBot\Bot\Engine\EngineInterface;
 use VBot\Game\Game;
-use VBot\Bot\Move\MoveEngineInterface;
-use VBot\Bot\Decision\DecisionEngineInterface;
 
 /**
  * Finite State Machine Bot
@@ -16,17 +15,17 @@ class FSMBot implements BotInterface
     /** @var boolean */
     const DEBUG = true;
 
-    /** @var DecisionEngineInterface */
+    /** @var EngineInterface */
     protected $decisionEngine;
 
-    /** @var MoveEngineInterface */
+    /** @var EngineInterface */
     protected $moveEngine;
 
     /**
-     * @param DecisionEngineInterface $decisionEngine
-     * @param MoveEngineInterface     $moveEngine
+     * @param EngineInterface $decisionEngine
+     * @param EngineInterface $moveEngine
      */
-    public function __construct(DecisionEngineInterface $decisionEngine, MoveEngineInterface $moveEngine)
+    public function __construct(EngineInterface $decisionEngine, EngineInterface $moveEngine)
     {
         $this->decisionEngine = $decisionEngine;
         $this->moveEngine = $moveEngine;

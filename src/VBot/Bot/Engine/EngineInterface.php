@@ -1,15 +1,15 @@
 <?php
 
-namespace VBot\Bot\Decision;
+namespace VBot\Bot\Engine;
 
 use VBot\Game\Game;
 
 /**
- * Decision engine interface, aims to choose the next target for the hero
+ * Engine interface, aims to update the hero depending on dedicated strategy
  *
  * @author Nicolas Dupont <nicolas@akeneo.com>
  */
-interface DecisionEngineInterface
+interface EngineInterface
 {
     /**
      * @param Game $game

@@ -1,6 +1,6 @@
 <?php
 
-namespace VBot\Bot\Decision;
+namespace VBot\Bot\Engine;
 
 use VBot\Game\Game;
 use VBot\Finite\Loader\ExpressionLoader;
@@ -11,11 +11,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Yaml\Parser;
 
 /**
- * Decision engine
+ * Choose the next target based on a FSM and inject it to the hero
  *
  * @author Nicolas Dupont <nicolas@akeneo.com>
  */
-class DecisionEngine implements DecisionEngineInterface, StatefulInterface
+class DecisionEngine implements EngineInterface, StatefulInterface
 {
     /** @var array */
     protected $options;
