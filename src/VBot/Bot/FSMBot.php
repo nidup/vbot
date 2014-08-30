@@ -53,7 +53,8 @@ class FSMBot implements BotInterface
         }
 
         $this->decisionEngine->process($game);
-        $destination = $this->moveEngine->process($game->getBoard(), $game->getHero());
+        $this->moveEngine->process($game);
+        $destination = $game->getHero()->getDestination();
 
         if (self::DEBUG) {
             $timeEnd = microtime(true);

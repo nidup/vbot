@@ -90,6 +90,7 @@ class Game
         foreach ($gameData['game']['heroes'] as $playerData) {
             if ($playerData['id'] !== $gameData['hero']['id']) {
                 $enemy = $this->enemies[$indEnemy];
+                // TODO : update board first to get mines
                 $enemy->update($playerData, $this->board->getMines());
                 $indEnemy++;
             }
