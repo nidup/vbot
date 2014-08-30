@@ -378,14 +378,17 @@ class Game
      */
     public function getClosestDestination(DestinationInterface $start, array $destinations)
     {
-        $pathLength = PHP_INT_MAX;
+        $maxCost = PHP_INT_MAX;
         $closest = null;
         foreach ($destinations as $destination) {
             $path = $this->getShortestPath($start, $destination);
-            if (count($path) < $pathLength) {
-                $pathLength = count($path);
+            $pathCost = 0;
+            foreach ($path as $node) {
+                $pathCost += $node->gScore;
+            }
+            if ($pathCost < $maxCost) {
+                $maxCost = $pathCost;
                 $closest = $destination;
-                // TODO : takes cost in account
             }
         }
 
