@@ -54,15 +54,15 @@ class FSMBot implements BotInterface
 
         $this->decisionEngine->process($game);
         $this->moveEngine->process($game);
-        $destination = $game->getHero()->getDestination();
+        $direction = $game->getHero()->getDirection();
 
         if (self::DEBUG) {
             $timeEnd = microtime(true);
             $time = $timeEnd - $timeStart;
             $memory = memory_get_peak_usage() / 1024 / 1024;
-            // echo sprintf('Time: %s sec, Memory: %s M', number_format($time, 2), number_format($memory, 2)).PHP_EOL;
+            //echo sprintf('Time: %s sec, Memory: %s M', number_format($time, 2), number_format($memory, 2)).PHP_EOL;
         }
 
-        return $destination;
+        return $direction;
     }
 }

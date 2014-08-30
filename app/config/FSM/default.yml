@@ -55,7 +55,7 @@ transitions:
         from:
             - goto-tavern
         to: hold-position
-        condition: 'hero.getLife() == 99 && game.getRanking().getVictoryRatio(hero) >= 80'
+        condition: 'hero.getLife() == 99 && game.getRanking().getVictoryRatio(hero) >= 80 && hero.getMineCount() >= 1'
         action:    'hero.resetTarget()'
     healed-then-goto-mine:
         from:

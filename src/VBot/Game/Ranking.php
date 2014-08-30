@@ -146,10 +146,11 @@ class Ranking
             $ratio -= 5;
         }
         // apply penality on number of mines owned, only one is quite dangerous ?
+        /*
         $ownedMinesRatio = count($currentPlayer->getOwnedMines()) / count($this->game->getMines()) * 100;
         if ($ownedMinesRatio < 25) {
             $ratio -= 10;
-        }
+        }*/
 
         return $ratio;
     }

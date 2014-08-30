@@ -7,7 +7,8 @@ use Prophecy\Argument;
 
 class GameSpec extends ObjectBehavior
 {
-    function let(){
+    function let()
+    {
         $gameData = [
             'game' => [
                 'id'   => 'id123',

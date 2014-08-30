@@ -21,8 +21,7 @@ class MoveEngine implements EngineInterface
             $hero->setDirection('Stay');
 
         } else {
-            $board = $game->getBoard();
-            $path = $board->getShortestPath($hero, $hero->getTarget());
+            $path = $game->getShortestPath($hero, $hero->getTarget());
             if (!isset($path[1])) {
                 $hero->setDirection('Stay');
 

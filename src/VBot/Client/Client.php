@@ -89,6 +89,7 @@ class Client
         } else {
             echo "Error when creating the game\n";
             echo $r['content'];
+            die();
         }
     }
 

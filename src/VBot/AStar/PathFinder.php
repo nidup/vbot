@@ -20,21 +20,21 @@ class PathFinder
     protected $closedList;
 
     /** @var integer[] */
-    protected $terrainCost;
+    protected $boardCosts;
 
     /**
-     * @param integer[] $terrainCost
+     * @param integer[] $boardCosts
      */
-    public function __construct(array $terrainCost)
+    public function __construct(array $boardCosts)
     {
         $this->openList = [];
         $this->closedList = [];
-        $this->terrainCost = $terrainCost;
+        $this->boardCosts = $boardCosts;
     }
 
     /**
-     * @param  Node   $start
-     * @param  Node   $goal
+     * @param Node $start
+     * @param Node $goal
      *
      * @return Node[]
      */
@@ -113,7 +113,7 @@ class PathFinder
             $adjacentNodes[]= new Node($node->row - 1, $node->column);
         }
         // bottom
-        if ($node->row < count($this->terrainCost) - 1) {
+        if ($node->row < count($this->boardCosts) - 1) {
             $adjacentNodes[]= new Node($node->row + 1, $node->column);
         }
         // left
@@ -121,7 +121,7 @@ class PathFinder
             $adjacentNodes[]= new Node($node->row, $node->column - 1);
         }
         // right
-        if ($node->column < count($this->terrainCost[0]) - 1) {
+        if ($node->column < count($this->boardCosts[0]) - 1) {
             $adjacentNodes[]= new Node($node->row, $node->column + 1);
         }
 
@@ -140,7 +140,7 @@ class PathFinder
             && abs($node->column - $adjacent->column) <= 1;
 
         if ($areAdjacent) {
-            return $this->terrainCost[$adjacent->row][$adjacent->column];
+            return $this->boardCosts[$adjacent->row][$adjacent->column];
         }
 
         return PHP_INT_MAX;

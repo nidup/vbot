@@ -13,19 +13,19 @@ namespace VBot\AStar;
  */
 class PathPrinter
 {
-    private $terrainCost;
-    private $path;
-    private $emptyTileToken = '-';
-    private $tileSize = 3;
-    private $padToken = ' ';
+    protected $boardCosts;
+    protected $path;
+    protected $emptyTileToken = '-';
+    protected $tileSize = 3;
+    protected $padToken = ' ';
 
     /**
-     * @param integer[] $terrainCost
+     * @param integer[] $boardCosts
      * @param Node[]    $path
      */
-    public function __construct($terrainCost, array $path)
+    public function __construct($boardCosts, array $path)
     {
-        $this->terrainCost = $terrainCost;
+        $this->boardCosts = $boardCosts;
         $this->path = $path;
     }
 
@@ -46,7 +46,7 @@ class PathPrinter
             $stringBoard[] = implode('', $row);
         }
 
-        echo implode("\n", $stringBoard);
+        echo "\n".implode("\n", $stringBoard);
     }
 
     /**
@@ -111,18 +111,18 @@ class PathPrinter
         $this->padToken = $padToken;
     }
 
-    private function generateEmptyBoard()
+    protected function generateEmptyBoard()
     {
         $emptyTile = $this->getTile($this->getEmptyTileToken());
 
-        $emptyRow = array_fill(0, count($this->terrainCost[0]), $emptyTile);
+        $emptyRow = array_fill(0, count($this->boardCosts[0]), $emptyTile);
 
-        $board = array_fill(0, count($this->terrainCost), $emptyRow);
+        $board = array_fill(0, count($this->boardCosts), $emptyRow);
 
         return $board;
     }
 
-    private function getTile($value)
+    protected function getTile($value)
     {
         return str_pad($value, $this->getTileSize(), $this->getPadToken(), STR_PAD_LEFT);
     }
