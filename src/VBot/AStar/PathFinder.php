@@ -6,7 +6,8 @@ namespace VBot\AStar;
  * Path finder, forked from git@github.com:jmgq/php-a-star.git
  *
  * We don't use this library due to performance issues on big graphes, mainly due to
- * number of calls and use of objects, we simplied it and, unfortunately, make it less readable
+ * number of calls and use of objects and methods, we simplied it and, unfortunately,
+ * make it less readable
  *
  * @author Nicolas Dupont <nicolas@akeneo.com>
  */
@@ -32,76 +33,12 @@ class PathFinder
     }
 
     /**
-     * Replaces original demo implementation to avoid to deal with diagonals
-     * @inheritdoc
-     */
-    public function generateAdjacentNodes(Node $node)
-    {
-        $adjacentNodes = array();
-
-        // top
-        if ($node->row > 0) {
-            $adjacentNodes[]= new Node($node->row - 1, $node->column);
-        }
-        // bottom
-        if ($node->row < count($this->terrainCost) - 1) {
-            $adjacentNodes[]= new Node($node->row + 1, $node->column);
-        }
-        // left
-        if ($node->column > 0) {
-            $adjacentNodes[]= new Node($node->row, $node->column - 1);
-        }
-        // right
-        if ($node->column < count($this->terrainCost[0]) - 1) {
-            $adjacentNodes[]= new Node($node->row, $node->column + 1);
-        }
-
-        return $adjacentNodes;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function calculateRealCost(Node $node, Node $adjacent)
-    {
-        $areAdjacent = abs($node->row - $adjacent->row) <= 1
-            && abs($node->column - $adjacent->column) <= 1;
-
-        if ($areAdjacent) {
-            return $this->terrainCost[$adjacent->row][$adjacent->column];
-        }
-
-        return PHP_INT_MAX;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function calculateEstimatedCost(Node $start, Node $end)
-    {
-        $rowFactor = pow($start->row - $end->row, 2);
-        $columnFactor = pow($start->column - $end->column, 2);
-
-        $euclideanDistance = sqrt($rowFactor + $columnFactor);
-
-        return $euclideanDistance;
-    }
-
-    /**
-     * Sets the algorithm to its initial state
-     */
-    public function clear()
-    {
-        $this->openList = [];
-        $this->closedList = [];
-    }
-
-    /**
      * @param  Node   $start
      * @param  Node   $goal
+     *
      * @return Node[]
      */
-    public function run(Node $start, Node $goal)
+    public function find(Node $start, Node $goal)
     {
         $path = array();
 
@@ -160,7 +97,86 @@ class PathFinder
         return $path;
     }
 
-    private function generatePathFromStartNodeTo(Node $node)
+    /**
+     * Replaces original demo implementation to avoid to deal with diagonals
+     *
+     * @param Node $node
+     *
+     * @return Node[]
+     */
+    protected function generateAdjacentNodes(Node $node)
+    {
+        $adjacentNodes = array();
+
+        // top
+        if ($node->row > 0) {
+            $adjacentNodes[]= new Node($node->row - 1, $node->column);
+        }
+        // bottom
+        if ($node->row < count($this->terrainCost) - 1) {
+            $adjacentNodes[]= new Node($node->row + 1, $node->column);
+        }
+        // left
+        if ($node->column > 0) {
+            $adjacentNodes[]= new Node($node->row, $node->column - 1);
+        }
+        // right
+        if ($node->column < count($this->terrainCost[0]) - 1) {
+            $adjacentNodes[]= new Node($node->row, $node->column + 1);
+        }
+
+        return $adjacentNodes;
+    }
+
+    /**
+     * @param Node $node
+     * @param Node $adjacent
+     *
+     * @return integer
+     */
+    protected function calculateRealCost(Node $node, Node $adjacent)
+    {
+        $areAdjacent = abs($node->row - $adjacent->row) <= 1
+            && abs($node->column - $adjacent->column) <= 1;
+
+        if ($areAdjacent) {
+            return $this->terrainCost[$adjacent->row][$adjacent->column];
+        }
+
+        return PHP_INT_MAX;
+    }
+
+    /**
+     * @param Node $start
+     * @param Node $end
+     *
+     * @return integer
+     */
+    protected function calculateEstimatedCost(Node $start, Node $end)
+    {
+        $rowFactor = pow($start->row - $end->row, 2);
+        $columnFactor = pow($start->column - $end->column, 2);
+
+        $euclideanDistance = sqrt($rowFactor + $columnFactor);
+
+        return $euclideanDistance;
+    }
+
+    /**
+     * Sets the algorithm to its initial state
+     */
+    protected function clear()
+    {
+        $this->openList = [];
+        $this->closedList = [];
+    }
+
+    /**
+     * @param Node $node
+     *
+     * @return Node[]
+     */
+    protected function generatePathFromStartNodeTo(Node $node)
     {
         $path = array();
 
@@ -175,7 +191,13 @@ class PathFinder
         return $path;
     }
 
-    private function computeAdjacentNodes(Node $node, Node $goal)
+    /**
+     * @param Node $node
+     * @param Node $goal
+     *
+     * @return Node[]
+     */
+    protected function computeAdjacentNodes(Node $node, Node $goal)
     {
         $nodes = $this->generateAdjacentNodes($node);
 

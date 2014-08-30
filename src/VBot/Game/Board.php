@@ -130,11 +130,11 @@ class Board
         $start = new Node($start->getPosX(), $start->getPosY());
         $destination = new Node($destination->getPosX(), $destination->getPosY());
         $aStar = new PathFinder($this->terrainCost);
-        $path = $aStar->run($start, $destination);
+        $path = $aStar->find($start, $destination);
 
         if (self::DEBUG) {
-            $printer = new AStar\SequencePrinter($this->terrainCost, $path);
-            $printer->printSequence();
+            $printer = new AStar\PathPrinter($this->terrainCost, $path);
+            $printer->printPath();
         }
 
         return $path;

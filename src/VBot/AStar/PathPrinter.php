@@ -2,23 +2,51 @@
 
 namespace VBot\AStar;
 
-// Quick attempt from git@github.com:jmgq/php-a-star.git
-class SequencePrinter
+/**
+ * Path printer, forked from git@github.com:jmgq/php-a-star.git
+ *
+ * We don't use this library due to performance issues on big graphes, mainly due to
+ * number of calls and use of objects and methods, we simplied it and, unfortunately,
+ * make it less readable
+ *
+ * @author Nicolas Dupont <nicolas@akeneo.com>
+ */
+class PathPrinter
 {
     private $terrainCost;
-    private $sequence;
+    private $path;
     private $emptyTileToken = '-';
     private $tileSize = 3;
     private $padToken = ' ';
 
     /**
      * @param integer[] $terrainCost
-     * @param Node[]    $sequence
+     * @param Node[]    $path
      */
-    public function __construct($terrainCost, array $sequence)
+    public function __construct($terrainCost, array $path)
     {
         $this->terrainCost = $terrainCost;
-        $this->sequence = $sequence;
+        $this->path = $path;
+    }
+
+    public function printPath()
+    {
+        $board = $this->generateEmptyBoard();
+
+        $step = 1;
+        foreach ($this->path as $node) {
+            $board[$node->getRow()][$node->getColumn()] = $this->getTile($step);
+
+            $step++;
+        }
+
+        $stringBoard = array();
+
+        foreach ($board as $row) {
+            $stringBoard[] = implode('', $row);
+        }
+
+        echo implode("\n", $stringBoard);
     }
 
     /**
@@ -81,26 +109,6 @@ class SequencePrinter
         }
 
         $this->padToken = $padToken;
-    }
-
-    public function printSequence()
-    {
-        $board = $this->generateEmptyBoard();
-
-        $step = 1;
-        foreach ($this->sequence as $node) {
-            $board[$node->getRow()][$node->getColumn()] = $this->getTile($step);
-
-            $step++;
-        }
-
-        $stringBoard = array();
-
-        foreach ($board as $row) {
-            $stringBoard[] = implode('', $row);
-        }
-
-        echo implode("\n", $stringBoard);
     }
 
     private function generateEmptyBoard()
