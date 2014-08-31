@@ -48,7 +48,7 @@ class Client
         $state = $this->getNewGameState();
         $game = new Game($state);
         echo "Playing at: " . $state['viewUrl'] . "\n";
-        var_dump($state);
+        echo json_encode($state);
 
         ob_start();
         while ($this->isFinished($state) === false) {
@@ -65,7 +65,7 @@ class Client
             }
         }
         $game->finish($state);
-        var_dump($state);
+        echo json_encode($state);
 
         ob_flush();
         ob_end_clean();

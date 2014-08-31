@@ -10,8 +10,10 @@ ini_set('display_errors', 1);
 use Symfony\Component\Console\Application;
 use VBot\Command\RunTrainingCommand;
 use VBot\Command\RunArenaCommand;
+use VBot\Command\RunDebugCommand;
 
 $application = new Application();
 $application->add(new RunTrainingCommand());
 $application->add(new RunArenaCommand());
+$application->add(new RunDebugCommand());
 $application->run();
