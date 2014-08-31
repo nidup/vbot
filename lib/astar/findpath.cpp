@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <sstream>
 
 #define DEBUG_LISTS 0
 #define DEBUG_LIST_LENGTHS_ONLY 0
@@ -25,6 +26,8 @@ using namespace std;
 
 const int MAP_WIDTH = 20;
 const int MAP_HEIGHT = 20;
+
+const int IMPASSABLE_COST = 9;
 
 int world_map[ MAP_WIDTH * MAP_HEIGHT ] = 
 {
@@ -63,7 +66,7 @@ int GetMap( int x, int y )
 		 y >= MAP_HEIGHT
 	  )
 	{
-		return 9;	 
+		return IMPASSABLE_COST;	 
 	}
 
 	return world_map[(y*MAP_WIDTH)+x];
@@ -162,7 +165,7 @@ bool MapSearchNode::GetSuccessors( AStarSearch<MapSearchNode> *astarsearch, MapS
 
 	// push each possible move except allowing the search to go backwards
 
-	if( (GetMap( x-1, y ) < 9) 
+	if( (GetMap( x-1, y ) < IMPASSABLE_COST) 
 		&& !((parent_x == x-1) && (parent_y == y))
 	  ) 
 	{
@@ -170,7 +173,7 @@ bool MapSearchNode::GetSuccessors( AStarSearch<MapSearchNode> *astarsearch, MapS
 		astarsearch->AddSuccessor( NewNode );
 	}	
 
-	if( (GetMap( x, y-1 ) < 9) 
+	if( (GetMap( x, y-1 ) < IMPASSABLE_COST) 
 		&& !((parent_x == x) && (parent_y == y-1))
 	  ) 
 	{
@@ -178,7 +181,7 @@ bool MapSearchNode::GetSuccessors( AStarSearch<MapSearchNode> *astarsearch, MapS
 		astarsearch->AddSuccessor( NewNode );
 	}	
 
-	if( (GetMap( x+1, y ) < 9)
+	if( (GetMap( x+1, y ) < IMPASSABLE_COST)
 		&& !((parent_x == x+1) && (parent_y == y))
 	  ) 
 	{
@@ -187,7 +190,7 @@ bool MapSearchNode::GetSuccessors( AStarSearch<MapSearchNode> *astarsearch, MapS
 	}	
 
 		
-	if( (GetMap( x, y+1 ) < 9) 
+	if( (GetMap( x, y+1 ) < IMPASSABLE_COST) 
 		&& !((parent_x == x) && (parent_y == y+1))
 		)
 	{
@@ -208,19 +211,65 @@ float MapSearchNode::GetCost( MapSearchNode &successor )
 
 }
 
-
-// Main
-
+// Main use : width height costs startX startY endX endY
 int main( int argc, char *argv[] )
 {
-
 	cout << "STL A* Search implementation\n(C)2001 Justin Heyes-Jones\n";
 
+    int mapWidth;
+    if (!(istringstream(argv[1]) >> mapWidth)) {
+        cerr << "Invalid mapWidth " << argv[1] << '\n';
+    }
+
+    int mapHeight;
+    if (!(istringstream(argv[2]) >> mapHeight)) {
+        cerr << "Invalid mapHeight " << argv[2] << '\n';
+    }
+
+    std::string costs = argv[3];
+    int worldMap[mapWidth * mapHeight];
+
+    std::string buffer = "";
+    int number;
+    int index = 0;
+    for(std::string::iterator it = costs.begin(); it <= costs.end(); ++it) {
+        if (*it == ',' || costs.end() == it) {
+            istringstream(buffer) >> number;
+            worldMap[index] = number;
+            buffer = "";
+            index++;
+        } else {
+            buffer = buffer + *it;
+        }
+    }
+
+    int startX;
+    if (!(istringstream(argv[4]) >> startX)) {
+        cerr << "Invalid startX " << argv[4] << '\n';
+    }
+    int startY;
+    if (!(istringstream(argv[5]) >> startY)) {
+        cerr << "Invalid startY " << argv[5] << '\n';
+    }
+
+    int endX;
+    if (!(istringstream(argv[6]) >> endX)) {
+        cerr << "Invalid endX " << argv[6] << '\n';
+    }
+    int endY;
+    if (!(istringstream(argv[7]) >> endY)) {
+        cerr << "Invalid endY " << argv[7] << '\n';
+    }
+
+
+
+    cout << "Width " << mapWidth << " Height " << mapHeight << '\n'; //+ " Tiles " tiles;
+
 	// Our sample problem defines the world as a 2d array representing a terrain
-	// Each element contains an integer from 0 to 5 which indicates the cost 
+	// Each element contains an integer from 0 to IMPASSABLE_COST-1 which indicates the cost 
 	// of travel across the terrain. Zero means the least possible difficulty 
-	// in travelling (think ice rink if you can skate) whilst 5 represents the 
-	// most difficult. 9 indicates that we cannot pass.
+	// in travelling (think ice rink if you can skate) whilst IMPASSABLE_COST-1 represents the 
+	// most difficult. IMPASSABLE_COST indicates that we cannot pass.
 
 	// Create an instance of the search class...
 
@@ -235,13 +284,13 @@ int main( int argc, char *argv[] )
 
 		// Create a start state
 		MapSearchNode nodeStart;
-		nodeStart.x = rand()%MAP_WIDTH;
-		nodeStart.y = rand()%MAP_HEIGHT; 
+		nodeStart.x = startX;
+		nodeStart.y = startY;
 
 		// Define the goal state
 		MapSearchNode nodeEnd;
-		nodeEnd.x = rand()%MAP_WIDTH;						
-		nodeEnd.y = rand()%MAP_HEIGHT; 
+		nodeEnd.x = endX;
+		nodeEnd.y = endY;
 		
 		// Set Start and goal states
 		
