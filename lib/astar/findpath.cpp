@@ -14,6 +14,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <sstream>
+#include <cstdlib>
 
 #define DEBUG_LISTS 0
 #define DEBUG_LIST_LENGTHS_ONLY 0
@@ -22,39 +23,14 @@ using namespace std;
 
 // Global data
 
-// The world map
+// The world map, we initialize the work map with a maximum map size
 
-const int MAP_WIDTH = 20;
-const int MAP_HEIGHT = 20;
-
-const int IMPASSABLE_COST = 9;
-
-int world_map[ MAP_WIDTH * MAP_HEIGHT ] = 
-{
-
-// 0001020304050607080910111213141516171819
-	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,   // 00
-	1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,   // 01
-	1,9,9,1,1,9,9,9,1,9,1,9,1,9,1,9,9,9,1,1,   // 02
-	1,9,9,1,1,9,9,9,1,9,1,9,1,9,1,9,9,9,1,1,   // 03
-	1,9,1,1,1,1,9,9,1,9,1,9,1,1,1,1,9,9,1,1,   // 04
-	1,9,1,1,9,1,1,1,1,9,1,1,1,1,9,1,1,1,1,1,   // 05
-	1,9,9,9,9,1,1,1,1,1,1,9,9,9,9,1,1,1,1,1,   // 06
-	1,9,9,9,9,9,9,9,9,1,1,1,9,9,9,9,9,9,9,1,   // 07
-	1,9,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,   // 08
-	1,9,1,9,9,9,9,9,9,9,1,1,9,9,9,9,9,9,9,1,   // 09
-	1,9,1,1,1,1,9,1,1,9,1,1,1,1,1,1,1,1,1,1,   // 10
-	1,9,9,9,9,9,1,9,1,9,1,9,9,9,9,9,1,1,1,1,   // 11
-	1,9,1,9,1,9,9,9,1,9,1,9,1,9,1,9,9,9,1,1,   // 12
-	1,9,1,9,1,9,9,9,1,9,1,9,1,9,1,9,9,9,1,1,   // 13
-	1,9,1,1,1,1,9,9,1,9,1,9,1,1,1,1,9,9,1,1,   // 14
-	1,9,1,1,9,1,1,1,1,9,1,1,1,1,9,1,1,1,1,1,   // 15
-	1,9,9,9,9,1,1,1,1,1,1,9,9,9,9,1,1,1,1,1,   // 16
-	1,1,9,9,9,9,9,9,9,1,1,1,9,9,9,1,9,9,9,9,   // 17
-	1,9,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,   // 18
-	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,   // 19
-
-};
+const int IMPASSABLE_COST = 999;
+const int MAX_MAP_WIDTH = 200;
+const int MAX_MAP_HEIGHT = 200;
+int MAP_WIDTH = MAX_MAP_WIDTH;
+int MAP_HEIGHT = MAX_MAP_HEIGHT;
+int world_map[MAX_MAP_WIDTH*MAX_MAP_HEIGHT];
 
 // map helper functions
 
@@ -115,7 +91,7 @@ bool MapSearchNode::IsSameState( MapSearchNode &rhs )
 void MapSearchNode::PrintNodeInfo()
 {
 	char str[100];
-	sprintf( str, "Node position : (%d,%d)\n", x,y );
+	sprintf( str, "{'x':%d,'y':%d}\n", x,y );
 
 	cout << str;
 }
@@ -214,20 +190,17 @@ float MapSearchNode::GetCost( MapSearchNode &successor )
 // Main use : width height costs startX startY endX endY
 int main( int argc, char *argv[] )
 {
-	cout << "STL A* Search implementation\n(C)2001 Justin Heyes-Jones\n";
-
-    int mapWidth;
-    if (!(istringstream(argv[1]) >> mapWidth)) {
+    if (!(istringstream(argv[1]) >> MAP_WIDTH) || MAP_WIDTH > MAX_MAP_WIDTH) {
         cerr << "Invalid mapWidth " << argv[1] << '\n';
+        return -1;
     }
 
-    int mapHeight;
-    if (!(istringstream(argv[2]) >> mapHeight)) {
+    if (!(istringstream(argv[2]) >> MAP_HEIGHT) || MAP_HEIGHT > MAX_MAP_HEIGHT) {
         cerr << "Invalid mapHeight " << argv[2] << '\n';
+        return -1;
     }
 
     std::string costs = argv[3];
-    int worldMap[mapWidth * mapHeight];
 
     std::string buffer = "";
     int number;
@@ -235,7 +208,8 @@ int main( int argc, char *argv[] )
     for(std::string::iterator it = costs.begin(); it <= costs.end(); ++it) {
         if (*it == ',' || costs.end() == it) {
             istringstream(buffer) >> number;
-            worldMap[index] = number;
+            //worldMap[index] = number;
+            world_map[index] = number;
             buffer = "";
             index++;
         } else {
@@ -244,26 +218,26 @@ int main( int argc, char *argv[] )
     }
 
     int startX;
-    if (!(istringstream(argv[4]) >> startX)) {
+    if (!(istringstream(argv[4]) >> startX) || startX > MAP_WIDTH - 1) {
         cerr << "Invalid startX " << argv[4] << '\n';
+        return -1;
     }
     int startY;
-    if (!(istringstream(argv[5]) >> startY)) {
+    if (!(istringstream(argv[5]) >> startY) || startY > MAP_HEIGHT - 1) {
         cerr << "Invalid startY " << argv[5] << '\n';
+        return -1;
     }
 
     int endX;
-    if (!(istringstream(argv[6]) >> endX)) {
+    if (!(istringstream(argv[6]) >> endX) || endX > MAP_WIDTH - 1) {
         cerr << "Invalid endX " << argv[6] << '\n';
+        return -1;
     }
     int endY;
-    if (!(istringstream(argv[7]) >> endY)) {
+    if (!(istringstream(argv[7]) >> endY) || endY > MAP_HEIGHT - 1) {
         cerr << "Invalid endY " << argv[7] << '\n';
+        return -1;
     }
-
-
-
-    cout << "Width " << mapWidth << " Height " << mapHeight << '\n'; //+ " Tiles " tiles;
 
 	// Our sample problem defines the world as a 2d array representing a terrain
 	// Each element contains an integer from 0 to IMPASSABLE_COST-1 which indicates the cost 
@@ -346,13 +320,8 @@ int main( int argc, char *argv[] )
 
 		if( SearchState == AStarSearch<MapSearchNode>::SEARCH_STATE_SUCCEEDED )
 		{
-			cout << "Search found goal state\n";
-
 				MapSearchNode *node = astarsearch.GetSolutionStart();
 
-	#if DISPLAY_SOLUTION
-				cout << "Displaying solution\n";
-	#endif
 				int steps = 0;
 
 				node->PrintNodeInfo();
@@ -370,7 +339,7 @@ int main( int argc, char *argv[] )
 				
 				};
 
-				cout << "Solution steps " << steps << endl;
+				// cout << "Solution steps " << steps << endl;
 
 				// Once you're done with the solution you can free the nodes up
 				astarsearch.FreeSolutionNodes();
@@ -380,11 +349,12 @@ int main( int argc, char *argv[] )
 		else if( SearchState == AStarSearch<MapSearchNode>::SEARCH_STATE_FAILED ) 
 		{
 			cout << "Search terminated. Did not find goal state\n";
-		
+
+            return -1;
 		}
 
 		// Display the number of loops the search went through
-		cout << "SearchSteps : " << SearchSteps << "\n";
+		// cout << "SearchSteps : " << SearchSteps << "\n";
 
 		SearchCount ++;
 
