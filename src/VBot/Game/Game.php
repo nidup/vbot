@@ -386,12 +386,14 @@ class Game
         foreach ($destinations as $destination) {
             $path = $this->getShortestPath($start, $destination);
             $pathCost = 0;
-            foreach ($path as $node) {
-                $pathCost += $node->gScore;
-            }
-            if ($pathCost < $maxCost) {
-                $maxCost = $pathCost;
-                $closest = $destination;
+            if (count($path) > 0) {
+                foreach ($path as $node) {
+                    $pathCost += $node->gScore;
+                }
+                if ($pathCost < $maxCost) {
+                    $maxCost = $pathCost;
+                    $closest = $destination;
+                }
             }
         }
 

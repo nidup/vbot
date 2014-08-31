@@ -26,6 +26,7 @@ class MoveEngine implements EngineInterface
                 $hero->setDirection('Stay');
 
             } else {
+
                 $myPosX = $hero->getPosX();
                 $myPosY = $hero->getPosY();
 

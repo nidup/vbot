@@ -16,6 +16,9 @@ use VBot\Game\Game;
 class PathFinder
 {
     /** @var boolean */
+    const DEBUG = true;
+
+    /** @var boolean */
     const USE_CPP_IMPL = true;
 
     /** @var Node[] */
@@ -46,10 +49,10 @@ class PathFinder
     public function find(Node $start, Node $goal)
     {
         if (self::USE_CPP_IMPL) {
-            $startX = $start->getRow();
-            $startY = $start->getColumn();
-            $endX = $goal->getRow();
-            $endY = $goal->getColumn();
+            $startY = $start->getRow();
+            $startX = $start->getColumn();
+            $endY = $goal->getRow();
+            $endX = $goal->getColumn();
 
             $width = count($this->boardCosts[0]);
             $height = count($this->boardCosts);
@@ -72,15 +75,21 @@ class PathFinder
             exec($cmd, $output, $return);
 
             if ($return !== 0) {
-                return [];
-                // TODO : check why some paths are not foundable
-                // throw new \Exception(sprintf('Path from %d:%d to %d:%d cannot be found with command %s', $startX, $startY, $endX, $endY, $cmd));
+                throw new \Exception(sprintf('Path from %d:%d to %d:%d cannot be found with command %s', $startX, $startY, $endX, $endY, $cmd));
             }
 
             $path = [];
-            foreach ($output as $node) {
-                $coords = json_decode($node, true);
-                $path[]= new Node($coords['x'], $coords['y']);
+            $debug = '';
+            foreach ($output as $token) {
+                $coords = json_decode($token, true);
+                $node = new Node($coords['y'], $coords['x']);
+                // TODO : for now inject in the node object, we need to refactor the path finding
+                $node->gScore = $coords['cost'];
+                $path[]= $node;
+                $debug[]= $coords['y'].':'.$coords['x'];
+            }
+            if (self::DEBUG) {
+                echo implode(',', $debug).PHP_EOL;
             }
 
             return $path;

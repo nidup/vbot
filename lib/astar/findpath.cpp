@@ -91,7 +91,7 @@ bool MapSearchNode::IsSameState( MapSearchNode &rhs )
 void MapSearchNode::PrintNodeInfo()
 {
 	char str[100];
-	sprintf( str, "{'x':%d,'y':%d}\n", x,y );
+	sprintf( str, "{'x':%d,'y':%d,'cost':%d}\n", x,y,GetMap(x,y) );
 
 	cout << str;
 }
@@ -208,7 +208,6 @@ int main( int argc, char *argv[] )
     for(std::string::iterator it = costs.begin(); it <= costs.end(); ++it) {
         if (*it == ',' || costs.end() == it) {
             istringstream(buffer) >> number;
-            //worldMap[index] = number;
             world_map[index] = number;
             buffer = "";
             index++;
