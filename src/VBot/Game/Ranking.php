@@ -137,20 +137,37 @@ class Ranking
                 $ratio = 20;
             }
         }
-        // apply precision penality on early game
-        if ($remainingTurns / $this->game->getMaxTurns() * 100 > 75) {
-            $ratio -= 15;
-        } elseif ($remainingTurns / $this->game->getMaxTurns() * 100 > 50) {
-            $ratio -= 10;
-        } elseif ($remainingTurns / $this->game->getMaxTurns() * 100 > 25) {
-            $ratio -= 5;
+
+        if ($ratio !== 1 && $ratio !== 99) {
+            // apply precision penality on early game
+            $maxTurns = $this->game->getMaxTurns() / 4;
+            $gameRatio = $remainingTurns / $maxTurns * 100;
+            if ($gameRatio > 75) {
+                $ratio -= 10;
+            } elseif ($gameRatio > 50) {
+                $ratio -= 5;
+            } elseif ($gameRatio > 25) {
+                $ratio -= 1;
+            }
+
+            // apply penality on number of owned mines
+            $ownedMinesRatio = count($currentPlayer->getOwnedMines()) / count($this->game->getMines()) * 100;
+            if ($ownedMinesRatio < 5) {
+                $ratio -= 35;
+            } elseif ($ownedMinesRatio < 10) {
+                $ratio -= 25;
+            } elseif ($ownedMinesRatio < 20) {
+                $ratio -= 15;
+            } elseif ($ownedMinesRatio < 30) {
+                $ratio -= 10;
+            } elseif ($ownedMinesRatio < 40) {
+                $ratio -= 5;
+            } elseif ($ownedMinesRatio < 50) {
+                $ratio -= 1;
+            }
+
+            $ratio = ($ratio < 20) ? 20 : $ratio;
         }
-        // apply penality on number of mines owned, only one is quite dangerous ?
-        /*
-        $ownedMinesRatio = count($currentPlayer->getOwnedMines()) / count($this->game->getMines()) * 100;
-        if ($ownedMinesRatio < 25) {
-            $ratio -= 10;
-        }*/
 
         return $ratio;
     }

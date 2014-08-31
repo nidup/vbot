@@ -63,12 +63,4 @@ transitions:
         to: goto-mine
         condition: 'hero.getLife() == 99 && game.ownsAllMines(hero) === false'
         action:    'hero.setTarget(game.getClosestNotOwnedMine(hero))'
-
-#    dying:
-#        from:
-#            - goto-mine
-#            - goto-tavern
-#            - goto-enemy
-#        to: dead
-#        condition: 'hero.isCrashed()'
-#        action:    ~
+    # TODO : healed, one beer if no risk around
