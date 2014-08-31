@@ -68,6 +68,9 @@ class Game
     /** @varstatic string */
     const IMPASSABLE_WOOD = '##';
 
+    /** @varstativ integer */
+    const MAX_COST = 999;
+
     /** @var boolean */
     const DEBUG = false;
 
@@ -378,7 +381,7 @@ class Game
      */
     public function getClosestDestination(DestinationInterface $start, array $destinations)
     {
-        $maxCost = PHP_INT_MAX;
+        $maxCost = self::MAX_COST;
         $closest = null;
         foreach ($destinations as $destination) {
             $path = $this->getShortestPath($start, $destination);

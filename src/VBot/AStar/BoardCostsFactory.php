@@ -39,7 +39,7 @@ class BoardCostsFactory
         $rowCost = [];
         foreach ($tiles as $tile) {
             if ($tile === Game::IMPASSABLE_WOOD) {
-                $rowCost[]= PHP_INT_MAX;
+                $rowCost[]= Game::MAX_COST;
             } elseif ($tile === Game::TAVERN) {
                 $rowCost[]= 50;
             } elseif (strpos($tile, '$') !== false) {
@@ -83,7 +83,7 @@ class BoardCostsFactory
                 foreach ($adjacents as $adjacent) {
                     $posX = $enemy->getPosX() + $adjacent['x'];
                     $posY = $enemy->getPosY() + $adjacent['y'];
-                    if (isset($boardCosts[$posX][$posY]) && $boardCosts[$posX][$posY] < PHP_INT_MAX) {
+                    if (isset($boardCosts[$posX][$posY]) && $boardCosts[$posX][$posY] < Game::MAX_COST) {
                         $boardCosts[$posX][$posY]= $boardCosts[$posX][$posY] + $adjacentCost;
                     }
                 }

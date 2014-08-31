@@ -2,6 +2,8 @@
 
 namespace VBot\AStar;
 
+use VBot\Game\Game;
+
 /**
  * Path finder, forked from git@github.com:jmgq/php-a-star.git
  *
@@ -13,6 +15,9 @@ namespace VBot\AStar;
  */
 class PathFinder
 {
+    /** @var boolean */
+    const USE_CPP_IMPL = true;
+
     /** @var Node[] */
     protected $openList;
 
@@ -40,61 +45,104 @@ class PathFinder
      */
     public function find(Node $start, Node $goal)
     {
-        $path = array();
+        if (self::USE_CPP_IMPL) {
+            $startX = $start->getRow();
+            $startY = $start->getColumn();
+            $endX = $goal->getRow();
+            $endY = $goal->getColumn();
 
-        $this->clear();
-
-        $start->gScore = 0;
-        $start->hScore = $this->calculateEstimatedCost($start, $goal);
-
-        $this->openList[$start->id] = $start;
-
-        while (!empty($this->openList)) {
-
-            $currentNode = null;
-            foreach ($this->openList as $node) {
-                $nodeF = $node->gScore + $node->hScore;
-                if ($currentNode === null || $nodeF < ($currentNode->gScore + $currentNode->hScore)) {
-                    $currentNode = $node;
-                }
+            $width = count($this->boardCosts[0]);
+            $height = count($this->boardCosts);
+            $costs = [];
+            foreach ($this->boardCosts as $rowCost) {
+                $costs[]= implode(',', $rowCost);
             }
-            if ($currentNode !== null) {
-                unset($this->openList[$currentNode->id]);
+            $costs = implode(',', $costs);
+
+            $cmd = sprintf(
+                'bin/findpath %d %d %s %d %d %d %d',
+                $width,
+                $height,
+                $costs,
+                $startX,
+                $startY,
+                $endX,
+                $endY
+            );
+            exec($cmd, $output, $return);
+
+            if ($return !== 0) {
+                return [];
+                // TODO : check why some paths are not foundable
+                // throw new \Exception(sprintf('Path from %d:%d to %d:%d cannot be found with command %s', $startX, $startY, $endX, $endY, $cmd));
             }
 
-            $this->closedList[$currentNode->id] = $currentNode;
-
-            if ($currentNode->id === $goal->id) {
-                $path = $this->generatePathFromStartNodeTo($currentNode);
-                break;
+            $path = [];
+            foreach ($output as $node) {
+                $coords = json_decode($node, true);
+                $path[]= new Node($coords['x'], $coords['y']);
             }
 
-            $successors = $this->computeAdjacentNodes($currentNode, $goal);
+            return $path;
 
-            foreach ($successors as $successor) {
-                if (isset($this->openList[$successor->id])) {
-                    $successorInOpenList = $this->openList[$successor->id];
+        } else {
 
-                    if ($successor->gScore >= $successorInOpenList->gScore) {
-                        continue;
+            $path = array();
+
+            $this->clear();
+
+            $start->gScore = 0;
+            $start->hScore = $this->calculateEstimatedCost($start, $goal);
+
+            $this->openList[$start->id] = $start;
+
+            while (!empty($this->openList)) {
+
+                $currentNode = null;
+                foreach ($this->openList as $node) {
+                    $nodeF = $node->gScore + $node->hScore;
+                    if ($currentNode === null || $nodeF < ($currentNode->gScore + $currentNode->hScore)) {
+                        $currentNode = $node;
                     }
                 }
-
-                if (isset($this->closedList[$successor->id])) {
-                    $successorInClosedList = $this->closedList[$successor->id];
-
-                    if ($successor->gScore >= $successorInClosedList->gScore) {
-                        continue;
-                    }
+                if ($currentNode !== null) {
+                    unset($this->openList[$currentNode->id]);
                 }
 
-                unset($this->closedList[$successor->id]);
+                $this->closedList[$currentNode->id] = $currentNode;
 
-                $this->openList[$successor->id]= $successor;
+                if ($currentNode->id === $goal->id) {
+                    $path = $this->generatePathFromStartNodeTo($currentNode);
+                    break;
+                }
+
+                $successors = $this->computeAdjacentNodes($currentNode, $goal);
+
+                foreach ($successors as $successor) {
+                    if (isset($this->openList[$successor->id])) {
+                        $successorInOpenList = $this->openList[$successor->id];
+
+                        if ($successor->gScore >= $successorInOpenList->gScore) {
+                            continue;
+                        }
+                    }
+
+                    if (isset($this->closedList[$successor->id])) {
+                        $successorInClosedList = $this->closedList[$successor->id];
+
+                        if ($successor->gScore >= $successorInClosedList->gScore) {
+                            continue;
+                        }
+                    }
+
+                    unset($this->closedList[$successor->id]);
+
+                    $this->openList[$successor->id]= $successor;
+                }
             }
+
+            return $path;
         }
-
-        return $path;
     }
 
     /**
@@ -143,7 +191,7 @@ class PathFinder
             return $this->boardCosts[$adjacent->row][$adjacent->column];
         }
 
-        return PHP_INT_MAX;
+        return Game::MAX_COST;
     }
 
     /**
